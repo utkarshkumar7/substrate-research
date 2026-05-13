@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Command Center — Design Mockup</title>
+<style>
+:root {
+  --bg: #0a0b0e;
+  --bg-card: #111217;
+  --bg-card-2: #16171c;
+  --bg-hover: #1a1b21;
+  --border: #1f2127;
+  --border-strong: #2a2c33;
+  --text: #e8e9ec;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --up: #4ade80;
+  --down: #f87171;
+  --neutral: #71717a;
+  --accent: #a78bfa;
+  --accent-2: #22d3ee;
+
+  /* Layer accent colors */
+  --c-raw: #b45309;
+  --c-energy: #ea580c;
+  --c-storage: #e11d48;
+  --c-foundry: #2563eb;
+  --c-chip: #4f46e5;
+  --c-quantum: #7c3aed;
+  --c-dc: #0d9488;
+  --c-apps: #16a34a;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.mockup-label {
+  max-width: 1440px;
+  margin: 48px auto 16px;
+  padding: 0 24px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.mockup-label:first-child { margin-top: 32px; }
+.mockup-label span {
+  display: inline-block;
+  margin-right: 12px;
+  padding: 2px 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.frame {
+  max-width: 1440px;
+  margin: 0 auto;
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* ============ Top Bar ============ */
+.topbar {
+  display: flex;
+  align-items: center;
+  height: 56px;
+  padding: 0 24px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+}
+.brand-mark {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #0a0b0e;
+  font-weight: 700;
+}
+.brand-suffix { color: var(--text-muted); font-weight: 400; }
+.topbar-search {
+  flex: 1;
+  max-width: 480px;
+  margin: 0 24px;
+  position: relative;
+}
+.topbar-search input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px 8px 36px;
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+}
+.topbar-search input:focus { outline: 1px solid var(--accent); }
+.topbar-search::before {
+  content: "⌕";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 14px;
+}
+.topbar-right { display: flex; gap: 8px; align-items: center; }
+.pill {
+  font-size: 11px;
+  padding: 4px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-secondary);
+}
+.pill .dot { display: inline-block; width: 6px; height: 6px; background: var(--up); border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+.btn-secondary {
+  font-size: 12px;
+  padding: 6px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+/* ============ Layout ============ */
+.layout {
+  display: grid;
+  grid-template-columns: 220px 1fr 320px;
+  min-height: 880px;
+}
+.sidebar {
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  padding: 20px 12px;
+}
+.nav-group { margin-bottom: 24px; }
+.nav-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  padding: 0 12px 8px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  margin-bottom: 2px;
+}
+.nav-item:hover { background: var(--bg-hover); color: var(--text); }
+.nav-item.active {
+  background: var(--bg-hover);
+  color: var(--text);
+  font-weight: 500;
+}
+.nav-item.active .nav-icon { color: var(--accent); }
+.nav-icon { width: 16px; display: inline-block; opacity: 0.9; }
+.nav-count {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--bg);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* ============ Main ============ */
+.main {
+  padding: 24px;
+  overflow: hidden;
+}
+.h-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.h-row h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.h-row .timestamp { font-size: 12px; color: var(--text-muted); }
+
+/* metric cards */
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.metric {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.metric-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+.metric-value {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.metric-delta { font-size: 12px; margin-top: 4px; }
+.up { color: var(--up); }
+.down { color: var(--down); }
+.muted { color: var(--text-muted); }
+
+/* ============ Pipeline Hero ============ */
+.section-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.section-title { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+.section-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.section-controls { display: flex; gap: 6px; }
+.chip {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.chip.active { background: var(--accent); color: #0a0b0e; border-color: var(--accent); font-weight: 500; }
+
+.pipeline-svg-wrap {
+  background: var(--bg);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.pipeline-svg { display: block; width: 100%; height: auto; }
+
+.layer-legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+/* ============ Heatmap ============ */
+.heatmap-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.heatmap-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.heatmap-cells {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.heat-cell {
+  font-size: 10px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  min-width: 56px;
+  text-align: center;
+  cursor: pointer;
+}
+/* heat scale */
+.heat-p3 { background: #14532d; color: #4ade80; }
+.heat-p2 { background: #166534; color: #86efac; }
+.heat-p1 { background: #14532d44; color: #4ade80; }
+.heat-z  { background: #1a1b21; color: #71717a; }
+.heat-n1 { background: #7f1d1d44; color: #f87171; }
+.heat-n2 { background: #7f1d1d; color: #fca5a5; }
+.heat-n3 { background: #991b1b; color: #fecaca; }
+
+/* ============ Right Rail ============ */
+.rail {
+  background: var(--bg-card);
+  border-left: 1px solid var(--border);
+  padding: 20px;
+  overflow-y: auto;
+}
+.rail-section { margin-bottom: 24px; }
+.rail-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.rail-title .model-tag {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 10px;
+  color: var(--accent);
+  padding: 1px 6px;
+  background: rgba(167, 139, 250, 0.1);
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  border-radius: 4px;
+}
+
+.insight-card {
+  background: var(--bg-card-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.insight-card .tag {
+  display: inline-block;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-right: 6px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.tag-alert { background: rgba(248, 113, 113, 0.15); color: var(--down); }
+.tag-signal { background: rgba(167, 139, 250, 0.15); color: var(--accent); }
+.tag-flow { background: rgba(34, 211, 238, 0.12); color: var(--accent-2); }
+.tag-info { background: rgba(156, 163, 175, 0.15); color: var(--text-secondary); }
+.insight-card strong { font-weight: 600; color: var(--text); }
+.insight-card .body { color: var(--text-secondary); margin-top: 4px; }
+.insight-card .timestamp-row {
+  margin-top: 6px;
+  font-size: 10px;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+}
+
+.holding-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+.holding-row:hover { background: var(--bg-card-2); }
+.holding-name { display: flex; align-items: center; gap: 8px; }
+.holding-bullet { width: 3px; height: 16px; border-radius: 2px; }
+.holding-sym { font-weight: 600; font-size: 12px; }
+.holding-sub { font-size: 10px; color: var(--text-muted); }
+.holding-value { font-family: ui-monospace, monospace; font-size: 12px; }
+.holding-delta { font-family: ui-monospace, monospace; font-size: 11px; min-width: 50px; text-align: right; }
+
+/* Stack health bars */
+.layer-health {
+  display: grid;
+  grid-template-columns: 90px 1fr 60px;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  font-size: 11px;
+}
+.layer-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg);
+  overflow: hidden;
+  position: relative;
+}
+.layer-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+}
+.layer-name { color: var(--text-secondary); font-size: 11px; }
+.layer-score { font-family: ui-monospace, monospace; font-size: 11px; text-align: right; }
+
+/* ============ Detail card (separate mockup) ============ */
+.detail-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+.spark { display: block; width: 100%; height: 90px; }
+
+/* ============ Helpers ============ */
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+.row { display: flex; align-items: center; gap: 8px; }
+.spacer { flex: 1; }
+hr { border: none; height: 1px; background: var(--border); }
+</style>
+</head>
+<body>
+
+<div class="mockup-label"><span>Screen 1</span> Home — Pipeline overview as the always-on hero</div>
+
+<div class="frame">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">AI</div>
+      <div>Command Center <span class="brand-suffix">/ supply chain</span></div>
+    </div>
+    <div class="topbar-search">
+      <input type="text" placeholder="Search tickers, layers, or ask Claude…" />
+    </div>
+    <div class="topbar-right">
+      <div class="pill"><span class="dot"></span>Live data · 2026-05-12 16:00 ET</div>
+      <button class="btn-secondary">Refresh</button>
+    </div>
+  </div>
+
+  <!-- Layout -->
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="nav-group">
+        <div class="nav-label">Views</div>
+        <div class="nav-item active"><span class="nav-icon">◉</span>Home<span class="nav-count">·</span></div>
+        <div class="nav-item"><span class="nav-icon">◈</span>Pipeline graph</div>
+        <div class="nav-item"><span class="nav-icon">▦</span>Layer heatmap</div>
+        <div class="nav-item"><span class="nav-icon">∿</span>Correlations</div>
+        <div class="nav-item"><span class="nav-icon">⌖</span>Anomalies<span class="nav-count">3</span></div>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">My stack</div>
+        <div class="nav-item"><span class="nav-icon">⛁</span>Portfolio</div>
+        <div class="nav-item"><span class="nav-icon">◴</span>Watchlist</div>
+        <div class="nav-item"><span class="nav-icon">⎘</span>Trade journal</div>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Intelligence</div>
+        <div class="nav-item"><span class="nav-icon">✦</span>Daily report</div>
+        <div class="nav-item"><span class="nav-icon">⊛</span>Weekly review</div>
+        <div class="nav-item"><span class="nav-icon">▷</span>Ask Claude</div>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Config</div>
+        <div class="nav-item"><span class="nav-icon">⚙</span>Topology</div>
+        <div class="nav-item"><span class="nav-icon">⚿</span>API keys</div>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+      <div class="h-row">
+        <h1>Stack overview</h1>
+        <div class="timestamp">Last refresh · today 16:02 ET · all data EOD via yfinance</div>
+      </div>
+
+      <!-- Metric cards -->
+      <div class="metric-grid">
+        <div class="metric">
+          <div class="metric-label">Basket vs SPY (5d)</div>
+          <div class="metric-value">+4.82<span style="font-size:14px;color:var(--text-muted)">%</span></div>
+          <div class="metric-delta up">↑ 2.4pp outperformance</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Hottest layer</div>
+          <div class="metric-value">Quantum</div>
+          <div class="metric-delta up">+11.3% · breadth 3/3</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Coldest layer</div>
+          <div class="metric-value">Storage</div>
+          <div class="metric-delta down">−3.1% · breadth 1/3</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Open anomalies</div>
+          <div class="metric-value">3</div>
+          <div class="metric-delta muted">2 correlation breaks · 1 vol spike</div>
+        </div>
+      </div>
+
+      <!-- Pipeline Section -->
+      <div class="section-card">
+        <div class="section-header">
+          <div>
+            <div class="section-title">AI supply chain pipeline</div>
+            <div class="section-subtitle">Silicon → chatbot · color = today's % change · width = market cap class</div>
+          </div>
+          <div class="section-controls">
+            <div class="chip active">1D</div>
+            <div class="chip">5D</div>
+            <div class="chip">1M</div>
+            <div class="chip">YTD</div>
+          </div>
+        </div>
+
+        <div class="pipeline-svg-wrap">
+          <!-- ===== PIPELINE SVG ===== -->
+          <svg class="pipeline-svg" viewBox="0 0 1180 540" xmlns="http://www.w3.org/2000/svg">
+            <!-- background gridlines -->
+            <defs>
+              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1a1b21" stroke-width="0.5"/>
+              </pattern>
+              <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#2a2c33"/>
+              </marker>
+              <marker id="arrow-up" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#22d3ee" fill-opacity="0.5"/>
+              </marker>
+            </defs>
+            <rect width="1180" height="540" fill="url(#grid)" opacity="0.4"/>
+
+            <!-- Layer headers -->
+            <g font-family="-apple-system, sans-serif" font-size="10" text-transform="uppercase" fill="#9ca3af" letter-spacing="1">
+              <text x="80"   y="22" text-anchor="middle">RAW MATERIALS</text>
+              <text x="280"  y="22" text-anchor="middle">ENERGY · STORAGE</text>
+              <text x="500"  y="22" text-anchor="middle">FOUNDRIES · MEMORY</text>
+              <text x="700"  y="22" text-anchor="middle">CHIP · QUANTUM</text>
+              <text x="900"  y="22" text-anchor="middle">DATACENTER</text>
+              <text x="1100" y="22" text-anchor="middle">APPLICATIONS</text>
+            </g>
+
+            <!-- Layer dividers -->
+            <g stroke="#1f2127" stroke-width="1">
+              <line x1="170" y1="40" x2="170" y2="525"/>
+              <line x1="390" y1="40" x2="390" y2="525"/>
+              <line x1="610" y1="40" x2="610" y2="525"/>
+              <line x1="800" y1="40" x2="800" y2="525"/>
+              <line x1="1010" y1="40" x2="1010" y2="525"/>
+            </g>
+
+            <!-- ============ EDGES (drawn first so nodes overlay) ============ -->
+            <g stroke-width="1" fill="none" opacity="0.45">
+              <!-- Raw -> Energy/Foundry -->
+              <path d="M 130 80 C 200 80, 220 100, 250 110" stroke="#9ca3af"/>   <!-- CCJ→OKLO -->
+              <path d="M 130 110 C 200 110, 220 120, 250 130" stroke="#9ca3af"/> <!-- LEU→OKLO -->
+              <path d="M 130 290 C 200 290, 220 300, 250 310" stroke="#9ca3af"/> <!-- LAC→TE -->
+              <path d="M 130 320 C 200 320, 220 320, 250 340" stroke="#9ca3af"/> <!-- LAC→FLNC -->
+              <path d="M 130 170 C 270 170, 350 400, 460 430" stroke="#9ca3af"/> <!-- UAMY→TSM hot strand -->
+              <path d="M 130 200 C 270 200, 1000 460, 1070 440" stroke="#9ca3af"/> <!-- MP→TSLA via rare earth long path -->
+
+              <!-- Energy -> DC -->
+              <path d="M 350 110 C 600 110, 750 200, 870 220" stroke="#9ca3af"/> <!-- OKLO→CRWV -->
+              <path d="M 350 140 C 600 140, 750 230, 870 250" stroke="#9ca3af"/> <!-- BE→CRWV -->
+              <path d="M 350 80 C 600 80, 750 100, 870 130" stroke="#9ca3af"/> <!-- GEV→NBIS -->
+
+              <!-- Battery -> DC -->
+              <path d="M 350 340 C 600 340, 750 290, 870 290" stroke="#9ca3af"/> <!-- FLNC→CRWV -->
+
+              <!-- Foundries -> Chip -->
+              <path d="M 570 100 C 600 100, 640 110, 670 120" stroke="#22d3ee" stroke-width="1.5" opacity="0.7"/> <!-- TSM→NVDA HOT -->
+              <path d="M 570 130 C 600 130, 640 130, 670 150" stroke="#22d3ee" stroke-width="1.5" opacity="0.7"/> <!-- TSM→AMD HOT -->
+              <path d="M 570 100 C 700 100, 1010 380, 1070 410" stroke="#9ca3af"/> <!-- TSM→TSLA long -->
+
+              <!-- Memory -> Chip -->
+              <path d="M 570 200 C 620 200, 650 130, 670 130" stroke="#9ca3af"/> <!-- MU→NVDA HBM -->
+              <path d="M 570 230 C 620 230, 650 280, 670 280" stroke="#9ca3af"/> <!-- MU→AMD -->
+
+              <!-- Chip -> DC -->
+              <path d="M 770 120 C 820 120, 850 200, 880 220" stroke="#22d3ee" stroke-width="1.5" opacity="0.7"/> <!-- NVDA→CRWV HOT -->
+              <path d="M 770 120 C 820 120, 850 130, 880 130" stroke="#22d3ee" stroke-width="1.2" opacity="0.7"/> <!-- NVDA→NBIS -->
+              <path d="M 770 120 C 820 120, 850 380, 880 410" stroke="#22d3ee" stroke-width="1.2" opacity="0.7"/> <!-- NVDA→HUT -->
+              <path d="M 770 120 C 820 120, 850 350, 880 380" stroke="#22d3ee" stroke-width="1.2" opacity="0.7"/> <!-- NVDA→IREN -->
+              <path d="M 770 150 C 820 150, 850 220, 880 220" stroke="#9ca3af"/> <!-- AMD→CRWV -->
+              <path d="M 770 180 C 820 180, 850 100, 880 100" stroke="#9ca3af"/> <!-- INTC→DELL -->
+
+              <!-- DC internal -->
+              <path d="M 950 130 C 970 130, 980 200, 940 220" stroke="#9ca3af"/> <!-- DELL→CRWV -->
+              <path d="M 950 165 C 970 165, 970 200, 940 220" stroke="#9ca3af"/> <!-- VRT→CRWV -->
+
+              <!-- Chip -> Apps -->
+              <path d="M 770 120 C 1000 120, 1050 380, 1070 410" stroke="#22d3ee" stroke-width="1.5" opacity="0.7"/> <!-- NVDA→TSLA -->
+              <path d="M 770 120 C 1000 120, 1050 440, 1070 470" stroke="#9ca3af"/> <!-- NVDA→AMZN -->
+
+              <!-- DC -> Apps -->
+              <path d="M 950 220 C 1000 220, 1040 440, 1070 470" stroke="#9ca3af"/> <!-- CRWV→AMZN -->
+            </g>
+
+            <!-- ============ NODES ============ -->
+            <!-- Raw Materials (x≈30-130) -->
+            <g font-family="ui-monospace, monospace">
+              <!-- CCJ -->
+              <g><rect x="30" y="60" width="100" height="36" rx="6" fill="#16171c" stroke="#b45309" stroke-width="1"/>
+                <rect x="30" y="60" width="4" height="36" fill="#b45309"/>
+                <text x="42" y="76" fill="#e8e9ec" font-size="11" font-weight="600">CCJ</text>
+                <text x="42" y="88" fill="#9ca3af" font-size="9">Cameco</text>
+                <text x="120" y="80" fill="#4ade80" font-size="10" text-anchor="end">+2.1%</text></g>
+              <!-- LEU -->
+              <g><rect x="30" y="100" width="100" height="36" rx="6" fill="#16171c" stroke="#b45309" stroke-width="1"/>
+                <rect x="30" y="100" width="4" height="36" fill="#b45309"/>
+                <text x="42" y="116" fill="#e8e9ec" font-size="11" font-weight="600">LEU</text>
+                <text x="42" y="128" fill="#9ca3af" font-size="9">Centrus</text>
+                <text x="120" y="120" fill="#4ade80" font-size="10" text-anchor="end">+4.7%</text></g>
+              <!-- UUUU -->
+              <g><rect x="30" y="140" width="100" height="36" rx="6" fill="#16171c" stroke="#b45309" stroke-width="1"/>
+                <rect x="30" y="140" width="4" height="36" fill="#b45309"/>
+                <text x="42" y="156" fill="#e8e9ec" font-size="11" font-weight="600">UUUU</text>
+                <text x="42" y="168" fill="#9ca3af" font-size="9">Energy Fuels</text>
+                <text x="120" y="160" fill="#4ade80" font-size="10" text-anchor="end">+1.8%</text></g>
+              <!-- MP -->
+              <g><rect x="30" y="184" width="100" height="36" rx="6" fill="#16171c" stroke="#b45309" stroke-width="1"/>
+                <rect x="30" y="184" width="4" height="36" fill="#b45309"/>
+                <text x="42" y="200" fill="#e8e9ec" font-size="11" font-weight="600">MP</text>
+                <text x="42" y="212" fill="#9ca3af" font-size="9">MP Materials</text>
+                <text x="120" y="204" fill="#4ade80" font-size="10" text-anchor="end">+3.2%</text></g>
+              <!-- USAR -->
+              <g><rect x="30" y="224" width="100" height="36" rx="6" fill="#16171c" stroke="#b45309" stroke-width="1"/>
+                <rect x="30" y="224" width="4" height="36" fill="#b45309"/>
+                <text x="42" y="240" fill="#e8e9ec" font-size="11" font-weight="600">USAR</text>
+                <text x="42" y="252" fill="#9ca3af" font-size="9">USA Rare Earth</text>
+                <text x="120" y="244" fill="#f87171" font-size="10" text-anchor="end">−1.2%</text></g>
+              <!-- LAC -->
+              <g><rect x="30" y="270" width="100" height="36" rx="6" fill="#16171c" stroke="#b45309" stroke-width="1"/>
+                <rect x="30" y="270" width="4" height="36" fill="#b45309"/>
+                <text x="42" y="286" fill="#e8e9ec" font-size="11" font-weight="600">LAC</text>
+                <text x="42" y="298" fill="#9ca3af" font-size="9">Lithium Americas</text>
+                <text x="120" y="290" fill="#f87171" font-size="10" text-anchor="end">−2.4%</text></g>
+              <!-- UAMY -->
+              <g><rect x="30" y="310" width="100" height="36" rx="6" fill="#16171c" stroke="#b45309" stroke-width="1"/>
+                <rect x="30" y="310" width="4" height="36" fill="#b45309"/>
+                <text x="42" y="326" fill="#e8e9ec" font-size="11" font-weight="600">UAMY</text>
+                <text x="42" y="338" fill="#9ca3af" font-size="9">US Antimony</text>
+                <text x="120" y="330" fill="#4ade80" font-size="10" text-anchor="end">+5.6%</text></g>
+              <!-- TMC -->
+              <g><rect x="30" y="350" width="100" height="36" rx="6" fill="#16171c" stroke="#b45309" stroke-width="1"/>
+                <rect x="30" y="350" width="4" height="36" fill="#b45309"/>
+                <text x="42" y="366" fill="#e8e9ec" font-size="11" font-weight="600">TMC</text>
+                <text x="42" y="378" fill="#9ca3af" font-size="9">Metals Co</text>
+                <text x="120" y="370" fill="#9ca3af" font-size="10" text-anchor="end">+0.3%</text></g>
+              <!-- CRML -->
+              <g><rect x="30" y="390" width="100" height="36" rx="6" fill="#16171c" stroke="#b45309" stroke-width="1"/>
+                <rect x="30" y="390" width="4" height="36" fill="#b45309"/>
+                <text x="42" y="406" fill="#e8e9ec" font-size="11" font-weight="600">CRML</text>
+                <text x="42" y="418" fill="#9ca3af" font-size="9">Critical Metals</text>
+                <text x="120" y="410" fill="#f87171" font-size="10" text-anchor="end">−0.8%</text></g>
+              <!-- TMQ -->
+              <g><rect x="30" y="430" width="100" height="36" rx="6" fill="#16171c" stroke="#b45309" stroke-width="1"/>
+                <rect x="30" y="430" width="4" height="36" fill="#b45309"/>
+                <text x="42" y="446" fill="#e8e9ec" font-size="11" font-weight="600">TMQ</text>
+                <text x="42" y="458" fill="#9ca3af" font-size="9">Trilogy Metals</text>
+                <text x="120" y="450" fill="#9ca3af" font-size="10" text-anchor="end">+0.1%</text></g>
+
+              <!-- Energy (x≈250-350) -->
+              <g><rect x="250" y="60" width="100" height="36" rx="6" fill="#16171c" stroke="#ea580c" stroke-width="1"/>
+                <rect x="250" y="60" width="4" height="36" fill="#ea580c"/>
+                <text x="262" y="76" fill="#e8e9ec" font-size="11" font-weight="600">GEV</text>
+                <text x="262" y="88" fill="#9ca3af" font-size="9">GE Vernova</text>
+                <text x="340" y="80" fill="#4ade80" font-size="10" text-anchor="end">+1.4%</text></g>
+              <g><rect x="250" y="100" width="100" height="36" rx="6" fill="#16171c" stroke="#ea580c" stroke-width="1"/>
+                <rect x="250" y="100" width="4" height="36" fill="#ea580c"/>
+                <text x="262" y="116" fill="#e8e9ec" font-size="11" font-weight="600">OKLO</text>
+                <text x="262" y="128" fill="#9ca3af" font-size="9">Oklo</text>
+                <text x="340" y="120" fill="#4ade80" font-size="10" text-anchor="end">+6.9%</text></g>
+              <g><rect x="250" y="140" width="100" height="36" rx="6" fill="#16171c" stroke="#ea580c" stroke-width="1"/>
+                <rect x="250" y="140" width="4" height="36" fill="#ea580c"/>
+                <text x="262" y="156" fill="#e8e9ec" font-size="11" font-weight="600">BE</text>
+                <text x="262" y="168" fill="#9ca3af" font-size="9">Bloom Energy</text>
+                <text x="340" y="160" fill="#4ade80" font-size="10" text-anchor="end">+3.4%</text></g>
+              <g><rect x="250" y="180" width="100" height="36" rx="6" fill="#16171c" stroke="#ea580c" stroke-width="1"/>
+                <rect x="250" y="180" width="4" height="36" fill="#ea580c"/>
+                <text x="262" y="196" fill="#e8e9ec" font-size="11" font-weight="600">XE</text>
+                <text x="262" y="208" fill="#9ca3af" font-size="9">X-Energy</text>
+                <text x="340" y="200" fill="#9ca3af" font-size="10" text-anchor="end">+0.6%</text></g>
+              <g><rect x="250" y="220" width="100" height="36" rx="6" fill="#16171c" stroke="#ea580c" stroke-width="1"/>
+                <rect x="250" y="220" width="4" height="36" fill="#ea580c"/>
+                <text x="262" y="236" fill="#e8e9ec" font-size="11" font-weight="600">VICR</text>
+                <text x="262" y="248" fill="#9ca3af" font-size="9">Vicor</text>
+                <text x="340" y="240" fill="#4ade80" font-size="10" text-anchor="end">+2.0%</text></g>
+              <g><rect x="250" y="260" width="100" height="36" rx="6" fill="#16171c" stroke="#ea580c" stroke-width="1"/>
+                <rect x="250" y="260" width="4" height="36" fill="#ea580c"/>
+                <text x="262" y="276" fill="#e8e9ec" font-size="11" font-weight="600">FCEL</text>
+                <text x="262" y="288" fill="#9ca3af" font-size="9">FuelCell</text>
+                <text x="340" y="280" fill="#f87171" font-size="10" text-anchor="end">−1.7%</text></g>
+              <g><rect x="250" y="300" width="100" height="36" rx="6" fill="#16171c" stroke="#ea580c" stroke-width="1"/>
+                <rect x="250" y="300" width="4" height="36" fill="#ea580c"/>
+                <text x="262" y="316" fill="#e8e9ec" font-size="11" font-weight="600">PLUG</text>
+                <text x="262" y="328" fill="#9ca3af" font-size="9">Plug Power</text>
+                <text x="340" y="320" fill="#f87171" font-size="10" text-anchor="end">−2.8%</text></g>
+
+              <!-- Storage/Batteries (same column, lower) -->
+              <g><rect x="250" y="350" width="100" height="36" rx="6" fill="#16171c" stroke="#e11d48" stroke-width="1"/>
+                <rect x="250" y="350" width="4" height="36" fill="#e11d48"/>
+                <text x="262" y="366" fill="#e8e9ec" font-size="11" font-weight="600">FLNC</text>
+                <text x="262" y="378" fill="#9ca3af" font-size="9">Fluence</text>
+                <text x="340" y="370" fill="#f87171" font-size="10" text-anchor="end">−3.1%</text></g>
+              <g><rect x="250" y="390" width="100" height="36" rx="6" fill="#16171c" stroke="#e11d48" stroke-width="1"/>
+                <rect x="250" y="390" width="4" height="36" fill="#e11d48"/>
+                <text x="262" y="406" fill="#e8e9ec" font-size="11" font-weight="600">TE</text>
+                <text x="262" y="418" fill="#9ca3af" font-size="9">T1 Energy</text>
+                <text x="340" y="410" fill="#f87171" font-size="10" text-anchor="end">−4.5%</text></g>
+              <g><rect x="250" y="430" width="100" height="36" rx="6" fill="#16171c" stroke="#e11d48" stroke-width="1"/>
+                <rect x="250" y="430" width="4" height="36" fill="#e11d48"/>
+                <text x="262" y="446" fill="#e8e9ec" font-size="11" font-weight="600">ELVA</text>
+                <text x="262" y="458" fill="#9ca3af" font-size="9">Electrovaya</text>
+                <text x="340" y="450" fill="#9ca3af" font-size="10" text-anchor="end">+0.2%</text></g>
+
+              <!-- Foundries (x≈470-570) -->
+              <g><rect x="470" y="80" width="100" height="36" rx="6" fill="#16171c" stroke="#2563eb" stroke-width="1"/>
+                <rect x="470" y="80" width="4" height="36" fill="#2563eb"/>
+                <text x="482" y="96" fill="#e8e9ec" font-size="11" font-weight="600">TSM</text>
+                <text x="482" y="108" fill="#9ca3af" font-size="9">TSMC</text>
+                <text x="560" y="100" fill="#4ade80" font-size="10" text-anchor="end">+3.8%</text></g>
+              <g><rect x="470" y="120" width="100" height="36" rx="6" fill="#16171c" stroke="#2563eb" stroke-width="1"/>
+                <rect x="470" y="120" width="4" height="36" fill="#2563eb"/>
+                <text x="482" y="136" fill="#e8e9ec" font-size="11" font-weight="600">DRAM</text>
+                <text x="482" y="148" fill="#9ca3af" font-size="9">Memory ETF</text>
+                <text x="560" y="140" fill="#4ade80" font-size="10" text-anchor="end">+2.5%</text></g>
+              <g><rect x="470" y="180" width="100" height="36" rx="6" fill="#16171c" stroke="#2563eb" stroke-width="1"/>
+                <rect x="470" y="180" width="4" height="36" fill="#2563eb"/>
+                <text x="482" y="196" fill="#e8e9ec" font-size="11" font-weight="600">MU</text>
+                <text x="482" y="208" fill="#9ca3af" font-size="9">Micron</text>
+                <text x="560" y="200" fill="#4ade80" font-size="10" text-anchor="end">+4.1%</text></g>
+              <g><rect x="470" y="220" width="100" height="36" rx="6" fill="#16171c" stroke="#2563eb" stroke-width="1"/>
+                <rect x="470" y="220" width="4" height="36" fill="#2563eb"/>
+                <text x="482" y="236" fill="#e8e9ec" font-size="11" font-weight="600">SNDK</text>
+                <text x="482" y="248" fill="#9ca3af" font-size="9">Sandisk</text>
+                <text x="560" y="240" fill="#4ade80" font-size="10" text-anchor="end">+1.2%</text></g>
+              <g><rect x="470" y="260" width="100" height="36" rx="6" fill="#16171c" stroke="#2563eb" stroke-width="1"/>
+                <rect x="470" y="260" width="4" height="36" fill="#2563eb"/>
+                <text x="482" y="276" fill="#e8e9ec" font-size="11" font-weight="600">STX</text>
+                <text x="482" y="288" fill="#9ca3af" font-size="9">Seagate</text>
+                <text x="560" y="280" fill="#4ade80" font-size="10" text-anchor="end">+0.9%</text></g>
+              <g><rect x="470" y="300" width="100" height="36" rx="6" fill="#16171c" stroke="#2563eb" stroke-width="1"/>
+                <rect x="470" y="300" width="4" height="36" fill="#2563eb"/>
+                <text x="482" y="316" fill="#e8e9ec" font-size="11" font-weight="600">WDC</text>
+                <text x="482" y="328" fill="#9ca3af" font-size="9">Western Digital</text>
+                <text x="560" y="320" fill="#9ca3af" font-size="10" text-anchor="end">−0.4%</text></g>
+              <g><rect x="470" y="350" width="100" height="36" rx="6" fill="#16171c" stroke="#2563eb" stroke-width="1"/>
+                <rect x="470" y="350" width="4" height="36" fill="#2563eb"/>
+                <text x="482" y="366" fill="#e8e9ec" font-size="11" font-weight="600">MRAM</text>
+                <text x="482" y="378" fill="#9ca3af" font-size="9">Everspin</text>
+                <text x="560" y="370" fill="#f87171" font-size="10" text-anchor="end">−1.6%</text></g>
+
+              <!-- Chip Design + Quantum (x≈670-770) -->
+              <g><rect x="670" y="100" width="100" height="36" rx="6" fill="#16171c" stroke="#4f46e5" stroke-width="1"/>
+                <rect x="670" y="100" width="4" height="36" fill="#4f46e5"/>
+                <text x="682" y="116" fill="#e8e9ec" font-size="11" font-weight="600">NVDA</text>
+                <text x="682" y="128" fill="#9ca3af" font-size="9">NVIDIA</text>
+                <text x="760" y="120" fill="#4ade80" font-size="10" text-anchor="end">+5.2%</text></g>
+              <g><rect x="670" y="140" width="100" height="36" rx="6" fill="#16171c" stroke="#4f46e5" stroke-width="1"/>
+                <rect x="670" y="140" width="4" height="36" fill="#4f46e5"/>
+                <text x="682" y="156" fill="#e8e9ec" font-size="11" font-weight="600">AMD</text>
+                <text x="682" y="168" fill="#9ca3af" font-size="9">AMD</text>
+                <text x="760" y="160" fill="#4ade80" font-size="10" text-anchor="end">+3.7%</text></g>
+              <g><rect x="670" y="180" width="100" height="36" rx="6" fill="#16171c" stroke="#4f46e5" stroke-width="1"/>
+                <rect x="670" y="180" width="4" height="36" fill="#4f46e5"/>
+                <text x="682" y="196" fill="#e8e9ec" font-size="11" font-weight="600">INTC</text>
+                <text x="682" y="208" fill="#9ca3af" font-size="9">Intel</text>
+                <text x="760" y="200" fill="#9ca3af" font-size="10" text-anchor="end">+0.7%</text></g>
+
+              <!-- Quantum -->
+              <g><rect x="670" y="260" width="100" height="36" rx="6" fill="#16171c" stroke="#7c3aed" stroke-width="1"/>
+                <rect x="670" y="260" width="4" height="36" fill="#7c3aed"/>
+                <text x="682" y="276" fill="#e8e9ec" font-size="11" font-weight="600">IONQ</text>
+                <text x="682" y="288" fill="#9ca3af" font-size="9">IonQ</text>
+                <text x="760" y="280" fill="#4ade80" font-size="10" text-anchor="end">+12.4%</text></g>
+              <g><rect x="670" y="300" width="100" height="36" rx="6" fill="#16171c" stroke="#7c3aed" stroke-width="1"/>
+                <rect x="670" y="300" width="4" height="36" fill="#7c3aed"/>
+                <text x="682" y="316" fill="#e8e9ec" font-size="11" font-weight="600">QBTS</text>
+                <text x="682" y="328" fill="#9ca3af" font-size="9">D-Wave</text>
+                <text x="760" y="320" fill="#4ade80" font-size="10" text-anchor="end">+9.8%</text></g>
+              <g><rect x="670" y="340" width="100" height="36" rx="6" fill="#16171c" stroke="#7c3aed" stroke-width="1"/>
+                <rect x="670" y="340" width="4" height="36" fill="#7c3aed"/>
+                <text x="682" y="356" fill="#e8e9ec" font-size="11" font-weight="600">RGTI</text>
+                <text x="682" y="368" fill="#9ca3af" font-size="9">Rigetti</text>
+                <text x="760" y="360" fill="#4ade80" font-size="10" text-anchor="end">+11.5%</text></g>
+
+              <!-- Datacenter (x≈870-970) -->
+              <g><rect x="870" y="80" width="100" height="36" rx="6" fill="#16171c" stroke="#0d9488" stroke-width="1"/>
+                <rect x="870" y="80" width="4" height="36" fill="#0d9488"/>
+                <text x="882" y="96" fill="#e8e9ec" font-size="11" font-weight="600">DELL</text>
+                <text x="882" y="108" fill="#9ca3af" font-size="9">Dell</text>
+                <text x="960" y="100" fill="#4ade80" font-size="10" text-anchor="end">+2.6%</text></g>
+              <g><rect x="870" y="120" width="100" height="36" rx="6" fill="#16171c" stroke="#0d9488" stroke-width="1"/>
+                <rect x="870" y="120" width="4" height="36" fill="#0d9488"/>
+                <text x="882" y="136" fill="#e8e9ec" font-size="11" font-weight="600">NBIS</text>
+                <text x="882" y="148" fill="#9ca3af" font-size="9">Nebius</text>
+                <text x="960" y="140" fill="#4ade80" font-size="10" text-anchor="end">+7.1%</text></g>
+              <g><rect x="870" y="160" width="100" height="36" rx="6" fill="#16171c" stroke="#0d9488" stroke-width="1"/>
+                <rect x="870" y="160" width="4" height="36" fill="#0d9488"/>
+                <text x="882" y="176" fill="#e8e9ec" font-size="11" font-weight="600">VRT</text>
+                <text x="882" y="188" fill="#9ca3af" font-size="9">Vertiv</text>
+                <text x="960" y="180" fill="#4ade80" font-size="10" text-anchor="end">+4.3%</text></g>
+              <g><rect x="870" y="200" width="100" height="36" rx="6" fill="#16171c" stroke="#0d9488" stroke-width="1"/>
+                <rect x="870" y="200" width="4" height="36" fill="#0d9488"/>
+                <text x="882" y="216" fill="#e8e9ec" font-size="11" font-weight="600">CRWV</text>
+                <text x="882" y="228" fill="#9ca3af" font-size="9">CoreWeave</text>
+                <text x="960" y="220" fill="#4ade80" font-size="10" text-anchor="end">+8.9%</text></g>
+              <g><rect x="870" y="360" width="100" height="36" rx="6" fill="#16171c" stroke="#0d9488" stroke-width="1"/>
+                <rect x="870" y="360" width="4" height="36" fill="#0d9488"/>
+                <text x="882" y="376" fill="#e8e9ec" font-size="11" font-weight="600">IREN</text>
+                <text x="882" y="388" fill="#9ca3af" font-size="9">IREN</text>
+                <text x="960" y="380" fill="#4ade80" font-size="10" text-anchor="end">+6.2%</text></g>
+              <g><rect x="870" y="400" width="100" height="36" rx="6" fill="#16171c" stroke="#0d9488" stroke-width="1"/>
+                <rect x="870" y="400" width="4" height="36" fill="#0d9488"/>
+                <text x="882" y="416" fill="#e8e9ec" font-size="11" font-weight="600">HUT</text>
+                <text x="882" y="428" fill="#9ca3af" font-size="9">Hut 8</text>
+                <text x="960" y="420" fill="#4ade80" font-size="10" text-anchor="end">+5.1%</text></g>
+
+              <!-- Applications (x≈1070-1150) -->
+              <g><rect x="1050" y="80" width="100" height="36" rx="6" fill="#16171c" stroke="#16a34a" stroke-width="1"/>
+                <rect x="1050" y="80" width="4" height="36" fill="#16a34a"/>
+                <text x="1062" y="96" fill="#e8e9ec" font-size="11" font-weight="600">AMZN</text>
+                <text x="1062" y="108" fill="#9ca3af" font-size="9">Amazon</text>
+                <text x="1140" y="100" fill="#4ade80" font-size="10" text-anchor="end">+1.4%</text></g>
+              <g><rect x="1050" y="120" width="100" height="36" rx="6" fill="#16171c" stroke="#16a34a" stroke-width="1"/>
+                <rect x="1050" y="120" width="4" height="36" fill="#16a34a"/>
+                <text x="1062" y="136" fill="#e8e9ec" font-size="11" font-weight="600">TSLA</text>
+                <text x="1062" y="148" fill="#9ca3af" font-size="9">Tesla</text>
+                <text x="1140" y="140" fill="#4ade80" font-size="10" text-anchor="end">+3.0%</text></g>
+              <g><rect x="1050" y="180" width="100" height="36" rx="6" fill="#16171c" stroke="#16a34a" stroke-width="1"/>
+                <rect x="1050" y="180" width="4" height="36" fill="#16a34a"/>
+                <text x="1062" y="196" fill="#e8e9ec" font-size="11" font-weight="600">RKLB</text>
+                <text x="1062" y="208" fill="#9ca3af" font-size="9">Rocket Lab</text>
+                <text x="1140" y="200" fill="#4ade80" font-size="10" text-anchor="end">+2.2%</text></g>
+              <g><rect x="1050" y="220" width="100" height="36" rx="6" fill="#16171c" stroke="#16a34a" stroke-width="1"/>
+                <rect x="1050" y="220" width="4" height="36" fill="#16a34a"/>
+                <text x="1062" y="236" fill="#e8e9ec" font-size="11" font-weight="600">ASTS</text>
+                <text x="1062" y="248" fill="#9ca3af" font-size="9">AST SpaceMobile</text>
+                <text x="1140" y="240" fill="#4ade80" font-size="10" text-anchor="end">+4.8%</text></g>
+              <g><rect x="1050" y="260" width="100" height="36" rx="6" fill="#16171c" stroke="#16a34a" stroke-width="1"/>
+                <rect x="1050" y="260" width="4" height="36" fill="#16a34a"/>
+                <text x="1062" y="276" fill="#e8e9ec" font-size="11" font-weight="600">PL</text>
+                <text x="1062" y="288" fill="#9ca3af" font-size="9">Planet Labs</text>
+                <text x="1140" y="280" fill="#f87171" font-size="10" text-anchor="end">−0.5%</text></g>
+              <g><rect x="1050" y="300" width="100" height="36" rx="6" fill="#16171c" stroke="#16a34a" stroke-width="1"/>
+                <rect x="1050" y="300" width="4" height="36" fill="#16a34a"/>
+                <text x="1062" y="316" fill="#e8e9ec" font-size="11" font-weight="600">FLY</text>
+                <text x="1062" y="328" fill="#9ca3af" font-size="9">Firefly</text>
+                <text x="1140" y="320" fill="#9ca3af" font-size="10" text-anchor="end">+0.0%</text></g>
+              <g><rect x="1050" y="340" width="100" height="36" rx="6" fill="#16171c" stroke="#16a34a" stroke-width="1"/>
+                <rect x="1050" y="340" width="4" height="36" fill="#16a34a"/>
+                <text x="1062" y="356" fill="#e8e9ec" font-size="11" font-weight="600">GILT</text>
+                <text x="1062" y="368" fill="#9ca3af" font-size="9">Gilat</text>
+                <text x="1140" y="360" fill="#4ade80" font-size="10" text-anchor="end">+1.1%</text></g>
+              <g><rect x="1050" y="390" width="100" height="36" rx="6" fill="#16171c" stroke="#16a34a" stroke-width="1"/>
+                <rect x="1050" y="390" width="4" height="36" fill="#16a34a"/>
+                <text x="1062" y="406" fill="#e8e9ec" font-size="11" font-weight="600">ONDS</text>
+                <text x="1062" y="418" fill="#9ca3af" font-size="9">Ondas</text>
+                <text x="1140" y="410" fill="#4ade80" font-size="10" text-anchor="end">+6.5%</text></g>
+              <g><rect x="1050" y="430" width="100" height="36" rx="6" fill="#16171c" stroke="#16a34a" stroke-width="1"/>
+                <rect x="1050" y="430" width="4" height="36" fill="#16a34a"/>
+                <text x="1062" y="446" fill="#e8e9ec" font-size="11" font-weight="600">UMAC</text>
+                <text x="1062" y="458" fill="#9ca3af" font-size="9">Unusual Machines</text>
+                <text x="1140" y="450" fill="#4ade80" font-size="10" text-anchor="end">+3.9%</text></g>
+              <g><rect x="1050" y="470" width="100" height="36" rx="6" fill="#16171c" stroke="#16a34a" stroke-width="1"/>
+                <rect x="1050" y="470" width="4" height="36" fill="#16a34a"/>
+                <text x="1062" y="486" fill="#e8e9ec" font-size="11" font-weight="600">AVEX</text>
+                <text x="1062" y="498" fill="#9ca3af" font-size="9">Aevex</text>
+                <text x="1140" y="490" fill="#9ca3af" font-size="10" text-anchor="end">+0.4%</text></g>
+            </g>
+
+            <!-- highlighted "hot strand" label -->
+            <g>
+              <text x="820" y="525" fill="#22d3ee" font-size="10" font-family="-apple-system, sans-serif" opacity="0.7">
+                ━ cyan strand: today's hot flow (TSM → NVDA → CRWV → TSLA)
+              </text>
+            </g>
+          </svg>
+        </div>
+
+        <div class="layer-legend">
+          <div class="legend-item"><span class="legend-dot" style="background:#b45309"></span>Raw materials</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#ea580c"></span>Energy</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#e11d48"></span>Storage</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#2563eb"></span>Foundries &amp; memory</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#4f46e5"></span>Chip design</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#7c3aed"></span>Quantum</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#0d9488"></span>Datacenter</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#16a34a"></span>Applications</div>
+        </div>
+      </div>
+
+      <!-- Heatmap section -->
+      <div class="section-card">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Layer heatmap</div>
+            <div class="section-subtitle">Compact daily view · grouped by supply chain position</div>
+          </div>
+          <div class="section-controls">
+            <div class="chip">1D</div>
+            <div class="chip active">5D</div>
+            <div class="chip">1M</div>
+            <div class="chip">YTD</div>
+          </div>
+        </div>
+
+        <div class="heatmap-row">
+          <div class="heatmap-label"><span class="legend-dot" style="background:#7c3aed"></span>Quantum</div>
+          <div class="heatmap-cells">
+            <div class="heat-cell heat-p3">IONQ +12.4</div>
+            <div class="heat-cell heat-p3">RGTI +11.5</div>
+            <div class="heat-cell heat-p2">QBTS +9.8</div>
+          </div>
+        </div>
+        <div class="heatmap-row">
+          <div class="heatmap-label"><span class="legend-dot" style="background:#0d9488"></span>Datacenter</div>
+          <div class="heatmap-cells">
+            <div class="heat-cell heat-p2">CRWV +8.9</div>
+            <div class="heat-cell heat-p2">NBIS +7.1</div>
+            <div class="heat-cell heat-p1">IREN +6.2</div>
+            <div class="heat-cell heat-p1">HUT +5.1</div>
+            <div class="heat-cell heat-p1">VRT +4.3</div>
+            <div class="heat-cell heat-p1">DELL +2.6</div>
+          </div>
+        </div>
+        <div class="heatmap-row">
+          <div class="heatmap-label"><span class="legend-dot" style="background:#4f46e5"></span>Chip design</div>
+          <div class="heatmap-cells">
+            <div class="heat-cell heat-p2">NVDA +5.2</div>
+            <div class="heat-cell heat-p1">AMD +3.7</div>
+            <div class="heat-cell heat-z">INTC +0.7</div>
+          </div>
+        </div>
+        <div class="heatmap-row">
+          <div class="heatmap-label"><span class="legend-dot" style="background:#2563eb"></span>Foundries · memory</div>
+          <div class="heatmap-cells">
+            <div class="heat-cell heat-p1">MU +4.1</div>
+            <div class="heat-cell heat-p1">TSM +3.8</div>
+            <div class="heat-cell heat-p1">DRAM +2.5</div>
+            <div class="heat-cell heat-p1">SNDK +1.2</div>
+            <div class="heat-cell heat-z">STX +0.9</div>
+            <div class="heat-cell heat-z">WDC −0.4</div>
+            <div class="heat-cell heat-n1">MRAM −1.6</div>
+          </div>
+        </div>
+        <div class="heatmap-row">
+          <div class="heatmap-label"><span class="legend-dot" style="background:#ea580c"></span>Energy</div>
+          <div class="heatmap-cells">
+            <div class="heat-cell heat-p1">OKLO +6.9</div>
+            <div class="heat-cell heat-p1">BE +3.4</div>
+            <div class="heat-cell heat-p1">VICR +2.0</div>
+            <div class="heat-cell heat-p1">GEV +1.4</div>
+            <div class="heat-cell heat-z">XE +0.6</div>
+            <div class="heat-cell heat-n1">FCEL −1.7</div>
+            <div class="heat-cell heat-n2">PLUG −2.8</div>
+          </div>
+        </div>
+        <div class="heatmap-row">
+          <div class="heatmap-label"><span class="legend-dot" style="background:#b45309"></span>Raw materials</div>
+          <div class="heatmap-cells">
+            <div class="heat-cell heat-p2">UAMY +5.6</div>
+            <div class="heat-cell heat-p1">LEU +4.7</div>
+            <div class="heat-cell heat-p1">MP +3.2</div>
+            <div class="heat-cell heat-p1">CCJ +2.1</div>
+            <div class="heat-cell heat-z">UUUU +1.8</div>
+            <div class="heat-cell heat-z">TMC +0.3</div>
+            <div class="heat-cell heat-z">TMQ +0.1</div>
+            <div class="heat-cell heat-n1">CRML −0.8</div>
+            <div class="heat-cell heat-n1">USAR −1.2</div>
+            <div class="heat-cell heat-n2">LAC −2.4</div>
+          </div>
+        </div>
+        <div class="heatmap-row">
+          <div class="heatmap-label"><span class="legend-dot" style="background:#16a34a"></span>Applications</div>
+          <div class="heatmap-cells">
+            <div class="heat-cell heat-p1">ONDS +6.5</div>
+            <div class="heat-cell heat-p1">ASTS +4.8</div>
+            <div class="heat-cell heat-p1">UMAC +3.9</div>
+            <div class="heat-cell heat-p1">TSLA +3.0</div>
+            <div class="heat-cell heat-p1">RKLB +2.2</div>
+            <div class="heat-cell heat-z">AMZN +1.4</div>
+            <div class="heat-cell heat-z">GILT +1.1</div>
+            <div class="heat-cell heat-z">AVEX +0.4</div>
+            <div class="heat-cell heat-z">FLY 0.0</div>
+            <div class="heat-cell heat-n1">PL −0.5</div>
+          </div>
+        </div>
+        <div class="heatmap-row">
+          <div class="heatmap-label"><span class="legend-dot" style="background:#e11d48"></span>Storage</div>
+          <div class="heatmap-cells">
+            <div class="heat-cell heat-z">ELVA +0.2</div>
+            <div class="heat-cell heat-n2">FLNC −3.1</div>
+            <div class="heat-cell heat-n3">TE −4.5</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right rail -->
+    <div class="rail">
+      <div class="rail-section">
+        <div class="rail-title">Today's intelligence <span class="model-tag">sonnet 4.6</span></div>
+        <div class="insight-card">
+          <span class="tag tag-flow">FLOW</span>
+          <strong>Quantum is the day's outlier.</strong>
+          <div class="body">IONQ +12.4, RGTI +11.5, QBTS +9.8 — all three on breadth. No corresponding move in chip-design names. Could be sector rotation rather than fundamental news. Worth checking <a href="#" style="color:var(--accent-2)">news feed</a>.</div>
+          <div class="timestamp-row"><span>15 min ago</span><span>Reviewed 3 sources</span></div>
+        </div>
+        <div class="insight-card">
+          <span class="tag tag-alert">ANOMALY</span>
+          <strong>MP / USAR correlation broke.</strong>
+          <div class="body">90-day correlation 0.78 → 0.31 over last 5 sessions. MP +3.2, USAR −1.2 today. Rare-earth pair has historically moved together. Check for company-specific catalyst on USAR.</div>
+          <div class="timestamp-row"><span>1h ago</span><span>z-score 2.4σ</span></div>
+        </div>
+        <div class="insight-card">
+          <span class="tag tag-signal">SIGNAL</span>
+          <strong>OKLO leading the energy layer.</strong>
+          <div class="body">+6.9 today, +14.2 over 5d, while sector ETF URA flat. Lead-lag analysis suggests CRWV power-deal sympathy. Other SMR names (XE) lagging — possible mean-reversion setup.</div>
+          <div class="timestamp-row"><span>2h ago</span><span>Sonnet · 312 tokens</span></div>
+        </div>
+        <div class="insight-card">
+          <span class="tag tag-info">CONTEXT</span>
+          <strong>Storage layer red on lithium softness.</strong>
+          <div class="body">TE −4.5, FLNC −3.1, LAC −2.4. Lithium carbonate spot down 1.8% overnight. No idiosyncratic news in any of the three names.</div>
+          <div class="timestamp-row"><span>3h ago</span><span>Haiku 4.5</span></div>
+        </div>
+      </div>
+
+      <div class="rail-section">
+        <div class="rail-title">Layer health (5d)</div>
+        <div class="layer-health">
+          <div class="layer-name">Quantum</div>
+          <div class="layer-bar"><div class="layer-bar-fill" style="width:88%;background:#4ade80"></div></div>
+          <div class="layer-score up">+11.3</div>
+        </div>
+        <div class="layer-health">
+          <div class="layer-name">Datacenter</div>
+          <div class="layer-bar"><div class="layer-bar-fill" style="width:72%;background:#4ade80"></div></div>
+          <div class="layer-score up">+6.8</div>
+        </div>
+        <div class="layer-health">
+          <div class="layer-name">Chip design</div>
+          <div class="layer-bar"><div class="layer-bar-fill" style="width:55%;background:#4ade80"></div></div>
+          <div class="layer-score up">+4.1</div>
+        </div>
+        <div class="layer-health">
+          <div class="layer-name">Foundries</div>
+          <div class="layer-bar"><div class="layer-bar-fill" style="width:42%;background:#4ade80"></div></div>
+          <div class="layer-score up">+2.7</div>
+        </div>
+        <div class="layer-health">
+          <div class="layer-name">Apps</div>
+          <div class="layer-bar"><div class="layer-bar-fill" style="width:38%;background:#4ade80"></div></div>
+          <div class="layer-score up">+2.2</div>
+        </div>
+        <div class="layer-health">
+          <div class="layer-name">Energy</div>
+          <div class="layer-bar"><div class="layer-bar-fill" style="width:30%;background:#4ade80"></div></div>
+          <div class="layer-score up">+1.4</div>
+        </div>
+        <div class="layer-health">
+          <div class="layer-name">Raw materials</div>
+          <div class="layer-bar"><div class="layer-bar-fill" style="width:22%;background:#4ade80"></div></div>
+          <div class="layer-score up">+0.6</div>
+        </div>
+        <div class="layer-health">
+          <div class="layer-name">Storage</div>
+          <div class="layer-bar"><div class="layer-bar-fill" style="width:35%;background:#f87171"></div></div>
+          <div class="layer-score down">−3.1</div>
+        </div>
+      </div>
+
+      <div class="rail-section">
+        <div class="rail-title">Holdings</div>
+        <div class="holding-row">
+          <div class="holding-name">
+            <div class="holding-bullet" style="background:#4f46e5"></div>
+            <div><div class="holding-sym">NVDA</div><div class="holding-sub">Chip design</div></div>
+          </div>
+          <div class="holding-value">$24,830</div>
+          <div class="holding-delta up">+5.2%</div>
+        </div>
+        <div class="holding-row">
+          <div class="holding-name">
+            <div class="holding-bullet" style="background:#16a34a"></div>
+            <div><div class="holding-sym">GOOGL</div><div class="holding-sub">Hyperscaler*</div></div>
+          </div>
+          <div class="holding-value">$18,420</div>
+          <div class="holding-delta up">+1.8%</div>
+        </div>
+        <div class="holding-row">
+          <div class="holding-name">
+            <div class="holding-bullet" style="background:#2563eb"></div>
+            <div><div class="holding-sym">TSM</div><div class="holding-sub">Foundries</div></div>
+          </div>
+          <div class="holding-value">$11,210</div>
+          <div class="holding-delta up">+3.8%</div>
+        </div>
+        <div class="holding-row">
+          <div class="holding-name">
+            <div class="holding-bullet" style="background:#2563eb"></div>
+            <div><div class="holding-sym">DRAM</div><div class="holding-sub">Memory ETF</div></div>
+          </div>
+          <div class="holding-value">$6,840</div>
+          <div class="holding-delta up">+2.5%</div>
+        </div>
+        <div class="holding-row">
+          <div class="holding-name">
+            <div class="holding-bullet" style="background:#6b7280"></div>
+            <div><div class="holding-sym">HOOD</div><div class="holding-sub">Outside basket</div></div>
+          </div>
+          <div class="holding-value">$4,920</div>
+          <div class="holding-delta down">−0.6%</div>
+        </div>
+        <div class="holding-row">
+          <div class="holding-name">
+            <div class="holding-bullet" style="background:#6b7280"></div>
+            <div><div class="holding-sym">BMNR</div><div class="holding-sub">Outside basket</div></div>
+          </div>
+          <div class="holding-value">$2,180</div>
+          <div class="holding-delta up">+1.4%</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<div class="mockup-label"><span>Screen 2</span> Ticker detail — what you see when you click NVDA</div>
+
+<div class="frame">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">AI</div>
+      <div>Command Center <span class="brand-suffix">/ NVDA</span></div>
+    </div>
+    <div class="spacer"></div>
+    <div class="topbar-right">
+      <button class="btn-secondary">← Back to pipeline</button>
+    </div>
+  </div>
+
+  <div style="padding: 24px; background: var(--bg);">
+    <div style="display:flex; align-items:center; gap:16px; margin-bottom: 20px;">
+      <div style="width:56px;height:56px;border-radius:12px;background:#4f46e5;display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:18px;">NV</div>
+      <div>
+        <h1 style="margin:0;font-size:24px;">NVIDIA <span style="color:var(--text-muted);font-weight:400;font-size:16px;">· NVDA</span></h1>
+        <div style="color:var(--text-secondary);font-size:13px;margin-top:2px;">Chip design · GPU &amp; AI accelerator</div>
+      </div>
+      <div class="spacer"></div>
+      <div style="text-align:right;">
+        <div style="font-size:28px;font-weight:600;font-family:ui-monospace,monospace;">$952.40</div>
+        <div class="up" style="font-size:14px;">+$47.20 · +5.2%</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;">
+      <!-- Left: chart + flow -->
+      <div>
+        <div class="section-card" style="margin-bottom:12px;">
+          <div class="section-header">
+            <div>
+              <div class="section-title">Price · 6 month</div>
+              <div class="section-subtitle">EOD · vs SOXX (semis benchmark)</div>
+            </div>
+            <div class="section-controls">
+              <div class="chip">1M</div>
+              <div class="chip active">6M</div>
+              <div class="chip">1Y</div>
+              <div class="chip">5Y</div>
+            </div>
+          </div>
+          <svg viewBox="0 0 760 220" style="width:100%;height:220px;">
+            <defs>
+              <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stop-color="#4ade80" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="#4ade80" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- grid -->
+            <g stroke="#1f2127" stroke-width="0.5">
+              <line x1="0" y1="40" x2="760" y2="40"/>
+              <line x1="0" y1="90" x2="760" y2="90"/>
+              <line x1="0" y1="140" x2="760" y2="140"/>
+              <line x1="0" y1="190" x2="760" y2="190"/>
+            </g>
+            <!-- benchmark (gray) -->
+            <path d="M 0 150 L 60 145 L 120 140 L 180 138 L 240 142 L 300 130 L 360 125 L 420 120 L 480 115 L 540 110 L 600 108 L 660 105 L 720 102 L 760 100"
+                  stroke="#6b7280" stroke-width="1.5" fill="none" stroke-dasharray="3 3" opacity="0.7"/>
+            <!-- NVDA line -->
+            <path d="M 0 170 C 60 165, 120 155, 180 150 S 300 130, 360 120 S 480 100, 540 80 S 660 50, 760 30"
+                  stroke="#4ade80" stroke-width="2" fill="none"/>
+            <path d="M 0 170 C 60 165, 120 155, 180 150 S 300 130, 360 120 S 480 100, 540 80 S 660 50, 760 30 L 760 220 L 0 220 Z"
+                  fill="url(#g1)" opacity="0.8"/>
+            <!-- y-axis labels -->
+            <g fill="#6b7280" font-size="10" font-family="ui-monospace,monospace">
+              <text x="755" y="36" text-anchor="end">$1000</text>
+              <text x="755" y="86" text-anchor="end">$850</text>
+              <text x="755" y="136" text-anchor="end">$700</text>
+              <text x="755" y="186" text-anchor="end">$550</text>
+            </g>
+          </svg>
+        </div>
+
+        <div class="section-card">
+          <div class="section-title" style="margin-bottom:12px;">Upstream / downstream flow</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+            <div>
+              <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Upstream suppliers</div>
+              <div style="font-size:12px;line-height:1.8;">
+                <div><span style="display:inline-block;width:8px;height:8px;background:#2563eb;border-radius:2px;margin-right:8px;"></span>TSM — foundry fab <span class="up" style="float:right;font-family:ui-monospace,monospace;">+3.8%</span></div>
+                <div><span style="display:inline-block;width:8px;height:8px;background:#2563eb;border-radius:2px;margin-right:8px;"></span>MU — HBM memory <span class="up" style="float:right;font-family:ui-monospace,monospace;">+4.1%</span></div>
+                <div><span style="display:inline-block;width:8px;height:8px;background:#ea580c;border-radius:2px;margin-right:8px;"></span>VICR — power modules <span class="up" style="float:right;font-family:ui-monospace,monospace;">+2.0%</span></div>
+                <div><span style="display:inline-block;width:8px;height:8px;background:#2563eb;border-radius:2px;margin-right:8px;"></span>MRAM — emerging memory <span class="down" style="float:right;font-family:ui-monospace,monospace;">−1.6%</span></div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Downstream customers</div>
+              <div style="font-size:12px;line-height:1.8;">
+                <div><span style="display:inline-block;width:8px;height:8px;background:#0d9488;border-radius:2px;margin-right:8px;"></span>CRWV — neocloud <span class="up" style="float:right;font-family:ui-monospace,monospace;">+8.9%</span></div>
+                <div><span style="display:inline-block;width:8px;height:8px;background:#0d9488;border-radius:2px;margin-right:8px;"></span>NBIS — neocloud <span class="up" style="float:right;font-family:ui-monospace,monospace;">+7.1%</span></div>
+                <div><span style="display:inline-block;width:8px;height:8px;background:#0d9488;border-radius:2px;margin-right:8px;"></span>DELL — servers <span class="up" style="float:right;font-family:ui-monospace,monospace;">+2.6%</span></div>
+                <div><span style="display:inline-block;width:8px;height:8px;background:#16a34a;border-radius:2px;margin-right:8px;"></span>TSLA — training compute <span class="up" style="float:right;font-family:ui-monospace,monospace;">+3.0%</span></div>
+                <div><span style="display:inline-block;width:8px;height:8px;background:#16a34a;border-radius:2px;margin-right:8px;"></span>AMZN — gpu supply <span class="up" style="float:right;font-family:ui-monospace,monospace;">+1.4%</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: stats + AI take -->
+      <div>
+        <div class="section-card" style="margin-bottom:12px;">
+          <div class="section-title" style="margin-bottom:10px;">Stats</div>
+          <table style="width:100%;font-size:12px;">
+            <tr><td style="color:var(--text-muted);padding:4px 0;">Market cap</td><td style="text-align:right;font-family:ui-monospace,monospace;">$2.34T</td></tr>
+            <tr><td style="color:var(--text-muted);padding:4px 0;">Forward P/E</td><td style="text-align:right;font-family:ui-monospace,monospace;">32.4</td></tr>
+            <tr><td style="color:var(--text-muted);padding:4px 0;">52w range</td><td style="text-align:right;font-family:ui-monospace,monospace;">$420 – $987</td></tr>
+            <tr><td style="color:var(--text-muted);padding:4px 0;">1d / 5d / 1m</td><td style="text-align:right;" class="up">+5.2 / +12.4 / +22.1</td></tr>
+            <tr><td style="color:var(--text-muted);padding:4px 0;">RSI(14)</td><td style="text-align:right;font-family:ui-monospace,monospace;">68 (warm)</td></tr>
+            <tr><td style="color:var(--text-muted);padding:4px 0;">Beta vs SPY</td><td style="text-align:right;font-family:ui-monospace,monospace;">1.82</td></tr>
+          </table>
+        </div>
+        <div class="section-card">
+          <div class="rail-title" style="margin-bottom:10px;">Claude's take <span class="model-tag">sonnet 4.6</span></div>
+          <div style="font-size:12px;line-height:1.6;color:var(--text-secondary);">
+            Today's move is consistent with the broader datacenter rally — CRWV, NBIS, and IREN all leading. Upstream signal is bullish (TSM +3.8, MU +4.1 on HBM strength). RSI at 68 is warm but not extended.
+            <br><br>
+            Watch: if quantum names continue outperforming chip design through this week, may indicate rotation rather than secular AI compute strength.
+          </div>
+          <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:var(--text-muted);">
+            Not financial advice · Generated 16:01 ET · 412 tokens · $0.0036
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<div class="mockup-label"><span>Screen 3</span> Ask Claude — natural language queries against your stack</div>
+
+<div class="frame">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">AI</div>
+      <div>Command Center <span class="brand-suffix">/ ask claude</span></div>
+    </div>
+    <div class="spacer"></div>
+    <div class="topbar-right">
+      <div class="pill"><span class="dot" style="background:#a78bfa"></span>Sonnet 4.6 · $0.18 this session</div>
+    </div>
+  </div>
+
+  <div style="padding: 32px 48px; background: var(--bg); min-height: 540px;">
+    <div style="max-width:780px;margin:0 auto;">
+
+      <div style="margin-bottom:24px;">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">YOU</div>
+        <div style="font-size:14px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;">
+          Restructure my holdings. I'm overweight NVDA and GOOGL. Spread my conviction across the supply chain — show me 3 candidate allocations and their tradeoffs.
+        </div>
+      </div>
+
+      <div style="margin-bottom:24px;">
+        <div style="font-size:11px;color:var(--accent);margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+          <span style="display:inline-block;width:14px;height:14px;background:linear-gradient(135deg,#a78bfa,#22d3ee);border-radius:3px;"></span>
+          CLAUDE · used your topology, latest prices, and 1y correlation data
+        </div>
+        <div style="font-size:14px;line-height:1.7;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:18px 22px;color:var(--text-secondary);">
+          <p style="margin:0 0 14px;color:var(--text);">Three allocations, each with a different thesis. All weight your existing $68k basket; none recommend liquidating GOOGL since it's outside the AI-stack topology.</p>
+
+          <div style="background:var(--bg-card-2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
+              <strong style="color:var(--text);font-size:13px;">A · Picks-and-shovels</strong>
+              <span style="font-size:11px;color:var(--text-muted);">Lower vol · slower upside</span>
+            </div>
+            <div style="font-size:12px;line-height:1.7;">
+              Trim NVDA 35% → 22%. Add VRT (15%), MU (12%), TSM (15%). Rationale: same secular AI thesis, half the single-name risk. Beta drops from 1.6 to 1.3.
+            </div>
+          </div>
+
+          <div style="background:var(--bg-card-2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;border-left:2px solid var(--accent);">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
+              <strong style="color:var(--text);font-size:13px;">B · Full pipeline</strong>
+              <span style="font-size:11px;color:var(--accent);">↑ matches your stated thesis</span>
+            </div>
+            <div style="font-size:12px;line-height:1.7;">
+              One position per layer: USAR (raw, 8%) · OKLO (energy, 10%) · TSM (foundry, 15%) · NVDA (chip, 20%) · CRWV (DC, 15%) · TSLA (app, 12%) · cash 20%. Captures the entire silicon-to-chatbot bet. Higher correlation between names but each represents an independent thesis.
+            </div>
+          </div>
+
+          <div style="background:var(--bg-card-2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
+              <strong style="color:var(--text);font-size:13px;">C · Speculative tilt</strong>
+              <span style="font-size:11px;color:var(--text-muted);">Higher vol · asymmetric upside</span>
+            </div>
+            <div style="font-size:12px;line-height:1.7;">
+              Keep NVDA core (25%). Add small positions in IONQ, OKLO, CRWV, MP (5–8% each). Trade-off: drawdown risk is material; not for short horizons.
+            </div>
+          </div>
+
+          <div style="margin-top:14px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:10px;">
+            <strong style="color:var(--text-secondary);">Not financial advice.</strong> Generated from your topology + 252-day daily returns. I haven't checked earnings dates or pending news — verify before acting.
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;">
+        <input type="text" placeholder="Follow up — e.g. 'show me the correlation matrix for option B'" style="flex:1;background:transparent;border:none;color:var(--text);font-size:13px;outline:none;font-family:inherit;" />
+        <button class="btn-secondary">Send</button>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+        <div class="chip">Show correlations</div>
+        <div class="chip">Backtest option B vs SPY</div>
+        <div class="chip">What's missing?</div>
+        <div class="chip">Export as plan</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:1440px;margin:32px auto 64px;padding:0 24px;font-size:12px;color:var(--text-muted);">
+  Mockup · AI Supply Chain Command Center · designed as spec input for Claude Code. All numbers and signals shown are illustrative.
+</div>
+
+</body>
+</html>

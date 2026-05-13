@@ -1,0 +1,4 @@
+# Pull EOD prices on weekdays after market close (Central Time)
+0 17 * * 1-5 cd /path/to/ai-command-center/agent && uv run python refresh.py --period 1mo
+# Run insights pipeline after the price pull
+30 17 * * 1-5 cd /path/to/ai-command-center/agent && uv run python insights.py
