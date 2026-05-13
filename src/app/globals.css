@@ -57,6 +57,15 @@
   --font-size-3xl:  28px;
 }
 
+/* ── Heat cell buckets (match mockup exactly) ───────────────────── */
+.heat-p3 { background: #14532d;     color: #4ade80; }
+.heat-p2 { background: #166534;     color: #86efac; }
+.heat-p1 { background: #14532d44;   color: #4ade80; }
+.heat-z  { background: #1a1b21;     color: #71717a; }
+.heat-n1 { background: #7f1d1d44;   color: #f87171; }
+.heat-n2 { background: #7f1d1d;     color: #fca5a5; }
+.heat-n3 { background: #991b1b;     color: #fecaca; }
+
 *,
 *::before,
 *::after {
