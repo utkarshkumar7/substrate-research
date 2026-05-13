@@ -1,10 +1,40 @@
-export default function uaskPage() {
+import { createClient } from "@/lib/supabase/server"
+import AskChat from "@/components/ask/AskChat"
+import type { Message } from "@/components/ask/ChatThread"
+
+export default async function AskPage() {
+  const supabase = createClient()
+
+  // Load the most recent conversation to restore on page reload
+  const { data: conv } = await supabase
+    .from("conversations")
+    .select("id")
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  let initialMessages: Message[] = []
+  let initialConversationId: string | null = null
+
+  if (conv) {
+    initialConversationId = conv.id
+    const { data: msgs } = await supabase
+      .from("messages")
+      .select("role, content")
+      .eq("conversation_id", conv.id)
+      .order("created_at")
+      .limit(50)
+
+    initialMessages = (msgs ?? []).map((m) => ({
+      role: m.role as "user" | "assistant",
+      content: m.content,
+    }))
+  }
+
   return (
-    <div className="p-6">
-      <h1 className="font-semibold tracking-tight mb-2" style={{ fontSize: 22 }}>
-        uask
-      </h1>
-      <p className="text-text-muted" style={{ fontSize: 13 }}>Coming soon.</p>
-    </div>
-  );
+    <AskChat
+      initialMessages={initialMessages}
+      initialConversationId={initialConversationId}
+    />
+  )
 }

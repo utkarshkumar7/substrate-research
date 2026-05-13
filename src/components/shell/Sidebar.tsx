@@ -23,7 +23,7 @@ interface NavItem {
   label: string;
   href: string;
   icon: React.ElementType;
-  badge?: number | string;
+  badge?: number;
 }
 
 interface NavGroup {

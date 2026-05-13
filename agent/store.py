@@ -70,6 +70,35 @@ def mark_synced(symbol: str, error: Optional[str] = None) -> None:
     ).eq("symbol", symbol).execute()
 
 
+def insert_insight(
+    kind: str,
+    title: str,
+    body: str,
+    related_symbols: list[str],
+    related_layers: list[str],
+    model: str,
+    input_tokens: int,
+    output_tokens: int,
+    cost_usd: float,
+    metadata: Optional[dict] = None,
+) -> None:
+    client = get_client()
+    client.table("insights").insert(
+        {
+            "kind": kind,
+            "title": title,
+            "body": body,
+            "related_symbols": related_symbols,
+            "related_layers": related_layers,
+            "model": model,
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens,
+            "cost_usd": cost_usd,
+            "metadata": metadata,
+        }
+    ).execute()
+
+
 def log_refresh(
     success: bool,
     n_tickers: int,
