@@ -1,4 +1,6 @@
 import { useEffect, useRef } from "react"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 
 export interface Message {
   role: "user" | "assistant"
@@ -55,16 +57,47 @@ function AssistantBubble({ content, streaming = false }: { content: string; stre
         </div>
 
         {/* Content */}
-        <div
-          className="text-text-secondary"
-          style={{
-            fontSize: 14,
-            lineHeight: 1.7,
-            whiteSpace: "pre-wrap",
-            wordBreak: "break-word",
-          }}
-        >
-          {content}
+        <div className="text-text-secondary prose-chat">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              p: ({ children }) => (
+                <p style={{ fontSize: 14, lineHeight: 1.7, marginBottom: 8, color: "#9ca3af" }}>{children}</p>
+              ),
+              h3: ({ children }) => (
+                <h3 style={{ fontSize: 13, fontWeight: 600, color: "#e8e9ec", marginBottom: 6, marginTop: 14, letterSpacing: "0.02em" }}>{children}</h3>
+              ),
+              h2: ({ children }) => (
+                <h2 style={{ fontSize: 14, fontWeight: 600, color: "#e8e9ec", marginBottom: 8, marginTop: 16 }}>{children}</h2>
+              ),
+              strong: ({ children }) => (
+                <strong style={{ fontWeight: 600, color: "#e8e9ec" }}>{children}</strong>
+              ),
+              ul: ({ children }) => (
+                <ul style={{ paddingLeft: 16, marginBottom: 8 }}>{children}</ul>
+              ),
+              li: ({ children }) => (
+                <li style={{ fontSize: 14, lineHeight: 1.7, color: "#9ca3af", marginBottom: 2 }}>{children}</li>
+              ),
+              hr: () => <hr style={{ borderColor: "#1f2127", margin: "12px 0" }} />,
+              table: ({ children }) => (
+                <div style={{ overflowX: "auto", marginBottom: 10 }}>
+                  <table style={{ borderCollapse: "collapse", fontSize: 13, width: "100%" }}>{children}</table>
+                </div>
+              ),
+              th: ({ children }) => (
+                <th style={{ padding: "4px 10px", textAlign: "left", color: "#6b7280", fontWeight: 500, borderBottom: "1px solid #1f2127", whiteSpace: "nowrap" }}>{children}</th>
+              ),
+              td: ({ children }) => (
+                <td style={{ padding: "4px 10px", color: "#9ca3af", borderBottom: "1px solid #111217", whiteSpace: "nowrap" }}>{children}</td>
+              ),
+              code: ({ children }) => (
+                <code style={{ fontSize: 12, background: "#16171c", padding: "1px 5px", borderRadius: 4, color: "#a78bfa", fontFamily: "monospace" }}>{children}</code>
+              ),
+            }}
+          >
+            {content}
+          </ReactMarkdown>
           {streaming && (
             <span
               className="inline-block rounded-sm"
