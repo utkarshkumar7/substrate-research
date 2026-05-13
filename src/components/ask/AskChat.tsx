@@ -7,15 +7,16 @@ import ChatInput from "./ChatInput"
 interface Props {
   initialMessages: Message[]
   initialConversationId: string | null
+  initialInput?: string
 }
 
-export default function AskChat({ initialMessages, initialConversationId }: Props) {
+export default function AskChat({ initialMessages, initialConversationId, initialInput }: Props) {
   const [conversationId, setConversationId] = useState<string | null>(initialConversationId)
   const [messages, setMessages] = useState<Message[]>(initialMessages)
   const [streamingText, setStreamingText] = useState("")
   const [isStreaming, setIsStreaming] = useState(false)
-  const [input, setInput] = useState("")
-  const [chipsVisible, setChipsVisible] = useState(initialMessages.length === 0)
+  const [input, setInput] = useState(initialInput ?? "")
+  const [chipsVisible, setChipsVisible] = useState(initialMessages.length === 0 && !initialInput)
 
   const send = async (chipText?: string) => {
     const text = chipText ?? input.trim()

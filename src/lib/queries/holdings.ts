@@ -11,6 +11,26 @@ export interface HoldingRow {
   pnlPct: number | null
 }
 
+async function fetchLatestPrices(
+  client: SupabaseClient<Database>,
+  symbols: string[]
+): Promise<Record<string, { close: number; date: string }>> {
+  const latest: Record<string, { close: number; date: string }> = {}
+  await Promise.all(
+    symbols.map(async (sym) => {
+      const { data } = await client
+        .from("prices")
+        .select("close, trade_date")
+        .eq("symbol", sym)
+        .order("trade_date", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      if (data) latest[sym] = { close: Number(data.close), date: data.trade_date }
+    })
+  )
+  return latest
+}
+
 export async function getHoldingsWithPrices(
   client: SupabaseClient<Database>
 ): Promise<HoldingRow[]> {
@@ -22,21 +42,7 @@ export async function getHoldingsWithPrices(
   if (!holdings?.length) return []
 
   const symbols = holdings.map((h) => h.symbol)
-
-  const { data: prices, error: pErr } = await client
-    .from("prices")
-    .select("symbol, trade_date, close")
-    .in("symbol", symbols)
-    .order("trade_date", { ascending: false })
-
-  if (pErr) throw pErr
-
-  const latest: Record<string, { close: number; date: string }> = {}
-  for (const row of prices ?? []) {
-    if (!latest[row.symbol]) {
-      latest[row.symbol] = { close: Number(row.close), date: row.trade_date }
-    }
-  }
+  const latest = await fetchLatestPrices(client, symbols)
 
   return holdings
     .map((h) => {
