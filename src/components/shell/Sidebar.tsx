@@ -16,6 +16,7 @@ import {
   MessageSquare,
   Share2,
   KeyRound,
+  TrendingDown,
 } from "lucide-react";
 import { clsx } from "clsx";
 
@@ -38,6 +39,7 @@ const NAV: NavGroup[] = [
       { label: "Home", href: "/", icon: Home },
       { label: "Pipeline graph", href: "/pipeline", icon: GitBranch },
       { label: "Layer heatmap", href: "/heatmap", icon: LayoutGrid },
+      { label: "Pullback radar", href: "/pullback", icon: TrendingDown },
       { label: "Correlations", href: "/correlations", icon: Activity },
       { label: "Anomalies", href: "/anomalies", icon: AlertTriangle, badge: 0 },
     ],

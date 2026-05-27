@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "predev": "node scripts/gen-topology-ts.mjs",
+    "predev": "node scripts/gen-topology-ts.mjs && node scripts/gen-watchlist-ts.mjs",
     "dev": "next dev",
-    "prebuild": "node scripts/gen-topology-ts.mjs",
+    "prebuild": "node scripts/gen-topology-ts.mjs && node scripts/gen-watchlist-ts.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
