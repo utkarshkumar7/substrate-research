@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useMemo } from "react"
 import {
   LineChart,
   Line,
@@ -23,14 +23,7 @@ interface Props {
   benchCloses: ClosePoint[]   // ASC sorted
 }
 
-type Period = "1M" | "6M" | "1Y" | "2Y"
-
-const PERIOD_DAYS: Record<Period, number> = {
-  "1M":  21,
-  "6M": 126,
-  "1Y": 252,
-  "2Y": 504,
-}
+const DAYS_1Y = 252
 
 function trimToN(closes: ClosePoint[], n: number): ClosePoint[] {
   return closes.slice(-n)
@@ -72,52 +65,25 @@ function CustomTooltip({ active, payload, label }: any) {
 }
 
 export default function PriceChart({ symbol, symbolCloses, benchSymbol, benchCloses }: Props) {
-  const [period, setPeriod] = useState<Period>("1Y")
-
   const chartData = useMemo(() => {
-    const n = PERIOD_DAYS[period]
-    const sTrimmed = trimToN(symbolCloses, n)
-    const bTrimmed = trimToN(benchCloses, n)
+    const sTrimmed = trimToN(symbolCloses, DAYS_1Y)
+    const bTrimmed = trimToN(benchCloses, DAYS_1Y)
 
     const sNorm = normalize(sTrimmed)
     const bNorm = normalize(bTrimmed)
 
-    // Merge by date
     const bMap = new Map(bNorm.map((p) => [p.date, p.value]))
     return sNorm.map((p) => ({
       date: p.date,
       [symbol]: parseFloat(p.value.toFixed(2)),
       [benchSymbol]: parseFloat((bMap.get(p.date) ?? p.value).toFixed(2)),
     }))
-  }, [period, symbol, symbolCloses, benchSymbol, benchCloses])
-
-  const useLongDateFormat = period === "2Y" || period === "1Y"
+  }, [symbol, symbolCloses, benchSymbol, benchCloses])
 
   return (
     <div>
-      {/* Period chips */}
-      <div className="flex gap-1 mb-3">
-        {(["1M", "6M", "1Y", "2Y"] as Period[]).map((p) => (
-          <button
-            key={p}
-            onClick={() => setPeriod(p)}
-            className="rounded font-mono transition-colors"
-            style={{
-              fontSize: 11,
-              padding: "3px 10px",
-              background: period === p ? "#a78bfa" : "#1a1b21",
-              color: period === p ? "#0a0b0e" : "#9ca3af",
-              border: "none",
-              cursor: "pointer",
-              fontWeight: period === p ? 600 : 400,
-            }}
-          >
-            {p}
-          </button>
-        ))}
-        <span className="ml-auto text-text-muted" style={{ fontSize: 10, alignSelf: "center" }}>
-          indexed to 100
-        </span>
+      <div className="flex justify-end mb-2">
+        <span className="text-text-muted font-mono" style={{ fontSize: 10 }}>1Y · indexed to 100</span>
       </div>
 
       <ResponsiveContainer width="100%" height={220}>
@@ -129,7 +95,7 @@ export default function PriceChart({ symbol, symbolCloses, benchSymbol, benchClo
             tickLine={false}
             axisLine={false}
             interval="preserveStartEnd"
-            tickFormatter={useLongDateFormat ? formatYear : formatDate}
+            tickFormatter={formatYear}
             minTickGap={50}
           />
           <YAxis
