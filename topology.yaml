@@ -6,8 +6,8 @@
 metadata:
   name: "AI Supply Chain Command Center"
   description: "Pipeline from silicon to chatbot"
-  version: 1
-  last_updated: "2026-05-12"
+  version: 2
+  last_updated: "2026-05-20"
 
 # Layers are rendered left-to-right in the pipeline view.
 # `order` controls x-position; `parallel_to` lets two layers occupy the same column.
@@ -49,6 +49,13 @@ layers:
     order: 3
     parallel_to: chip_design
     color: "#7B5FB8"
+
+  - id: photonics
+    name: "Photonics & Optical"
+    description: "Optical transceivers, modulators, compound-semi substrates for AI datacenter interconnect"
+    order: 3
+    parallel_to: chip_design
+    color: "#0ea5e9"
 
   - id: datacenter_infra
     name: "Datacenter & Infrastructure"
@@ -177,6 +184,16 @@ tickers:
     subcategory: grid_storage
     notes: "BESS deployments alongside datacenters"
 
+  - symbol: AMPX
+    name: "Amprius"
+    layer: storage_batteries
+    subcategory: silicon_nanowire_batteries
+
+  - symbol: EOSE
+    name: "Eos Energy"
+    layer: storage_batteries
+    subcategory: zinc_battery_storage
+
   # ----- Foundries & Memory -----
   - symbol: TSM
     name: "TSMC"
@@ -224,6 +241,11 @@ tickers:
     is_etf: true
     notes: "ETF holding SK hynix, MU, Samsung, SNDK, Kioxia, STX, WDC, Nanya, Winbond"
 
+  - symbol: SIMO
+    name: "Silicon Motion"
+    layer: foundries_memory
+    subcategory: ssd_controllers
+
   # ----- Chip Design -----
   - symbol: NVDA
     name: "NVIDIA"
@@ -241,6 +263,28 @@ tickers:
     subcategory: cpu_foundry
     notes: "Also operates fabs (IDM model)"
 
+  - symbol: AMBQ
+    name: "Ambiq Micro"
+    layer: chip_design
+    subcategory: ultra_low_power_ai
+    notes: "Ultra-low-power AI chips, recent IPO"
+
+  - symbol: NVTS
+    name: "Navitas Semiconductor"
+    layer: chip_design
+    subcategory: gan_power
+
+  - symbol: ARM
+    name: "ARM Holdings"
+    layer: chip_design
+    subcategory: ip_licensing
+
+  - symbol: WOLF
+    name: "Wolfspeed"
+    layer: chip_design
+    subcategory: silicon_carbide
+    notes: "Silicon carbide; financial restructuring risk"
+
   # ----- Quantum -----
   - symbol: IONQ
     name: "IonQ"
@@ -256,6 +300,34 @@ tickers:
     name: "Rigetti Computing"
     layer: quantum
     subcategory: superconducting
+
+  # ----- Photonics & Optical -----
+  - symbol: LITE
+    name: "Lumentum"
+    layer: photonics
+    subcategory: optical_components
+
+  - symbol: COHR
+    name: "Coherent Corp"
+    layer: photonics
+    subcategory: lasers_photonics
+
+  - symbol: AAOI
+    name: "Applied Optoelectronics"
+    layer: photonics
+    subcategory: datacom_transceivers
+    notes: "History of guidance misses"
+
+  - symbol: AXTI
+    name: "AXT Inc"
+    layer: photonics
+    subcategory: compound_semi_substrates
+
+  - symbol: LWLG
+    name: "Lightwave Logic"
+    layer: photonics
+    subcategory: electro_optic_polymers
+    notes: "Pre-revenue, speculative"
 
   # ----- Datacenter & Infrastructure -----
   - symbol: DELL
@@ -344,6 +416,22 @@ tickers:
     name: "Unusual Machines"
     layer: applications
     subcategory: drones
+
+  - symbol: SATL
+    name: "Satellogic"
+    layer: applications
+    subcategory: earth_observation
+
+  - symbol: PLTR
+    name: "Palantir"
+    layer: applications
+    subcategory: ai_software
+
+  - symbol: OSS
+    name: "One Stop Systems"
+    layer: applications
+    subcategory: edge_compute_defense
+    notes: "Micro-cap, illiquid"
 
 # Edges encode supply chain dependencies (from -> to means "from supplies to").
 # Types: foundry_fab, memory_supply, power_supply, materials, components,
@@ -442,6 +530,42 @@ edges:
   # Datacenter -> Applications (compute capacity)
   - {from: CRWV, to: AMZN, type: compute_capacity, note: "Overlapping market for AI compute"}
 
+  # Photonics -> Datacenter interconnect
+  - {from: LITE, to: CRWV, type: optical_transceiver}
+  - {from: LITE, to: NBIS, type: optical_transceiver}
+  - {from: LITE, to: DELL, type: optical_components}
+  - {from: COHR, to: CRWV, type: optical_transceiver}
+  - {from: COHR, to: NBIS, type: optical_transceiver}
+  - {from: COHR, to: DELL, type: optical_components}
+  - {from: AAOI, to: CRWV, type: datacom_optics}
+  - {from: AAOI, to: NBIS, type: datacom_optics}
+
+  # Compound-semi substrates -> photonics + power chips
+  - {from: AXTI, to: LITE, type: substrate_supply}
+  - {from: AXTI, to: COHR, type: substrate_supply}
+  - {from: AXTI, to: NVTS, type: substrate_supply}
+
+  # Storage/Batteries -> Applications
+  - {from: AMPX, to: TSLA, type: battery_supply}
+  - {from: EOSE, to: CRWV, type: grid_storage, note: "Zinc BESS for datacenter resilience"}
+
+  # Memory + chip support
+  - {from: SIMO, to: SNDK, type: controller_supply}
+  - {from: SIMO, to: WDC,  type: controller_supply}
+
+  # Chip design additions
+  - {from: NVTS, to: VICR, type: power_chip_supply, note: "GaN in power conversion stages"}
+  - {from: ARM,  to: NVDA, type: ip_licensing, note: "ARM ISA in Grace CPU"}
+  - {from: ARM,  to: AMD,  type: ip_licensing}
+  - {from: ARM,  to: AMBQ, type: ip_licensing}
+  - {from: WOLF, to: TSLA, type: sic_inverters, note: "SiC in EV powertrains"}
+
+  # Applications additions
+  - {from: PLTR, to: AMZN, type: ai_software, note: "AI/data platforms; loose edge"}
+  - {from: NVDA, to: PLTR, type: gpu_supply,  note: "PLTR uses GPU compute"}
+  - {from: NVDA, to: OSS,  type: edge_compute_chips}
+  - {from: SATL, to: PL,   type: peer_overlap, note: "Both Earth observation; loose"}
+
 # Macro signals to overlay on dashboards (not edges, but inputs to layer-health scoring)
 macro_signals:
   - id: uranium_spot
@@ -459,6 +583,21 @@ macro_signals:
   - id: clean_energy
     affects: [BE, FCEL, PLUG, OKLO, XE]
     yfinance_proxy: "ICLN"
+  - id: ten_year_yield
+    affects: []
+    yfinance_proxy: "^TNX"
+  - id: usd_index
+    affects: []
+    yfinance_proxy: "DX-Y.NYB"
+  - id: vix
+    affects: []
+    yfinance_proxy: "^VIX"
+  - id: hyg
+    affects: []
+    yfinance_proxy: "HYG"
+  - id: lqd
+    affects: []
+    yfinance_proxy: "LQD"
 
 # ETF baskets we may want to compare our basket against
 benchmark_etfs:

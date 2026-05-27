@@ -5,8 +5,8 @@ export const TOPOLOGY: Topology = {
   "metadata": {
     "name": "AI Supply Chain Command Center",
     "description": "Pipeline from silicon to chatbot",
-    "version": 1,
-    "lastUpdated": "2026-05-12"
+    "version": 2,
+    "lastUpdated": "2026-05-20"
   },
   "layers": [
     {
@@ -52,6 +52,14 @@ export const TOPOLOGY: Topology = {
       "order": 3,
       "parallelTo": "chip_design",
       "color": "#7B5FB8"
+    },
+    {
+      "id": "photonics",
+      "name": "Photonics & Optical",
+      "description": "Optical transceivers, modulators, compound-semi substrates for AI datacenter interconnect",
+      "order": 3,
+      "parallelTo": "chip_design",
+      "color": "#0ea5e9"
     },
     {
       "id": "datacenter_infra",
@@ -199,6 +207,18 @@ export const TOPOLOGY: Topology = {
       "notes": "BESS deployments alongside datacenters"
     },
     {
+      "symbol": "AMPX",
+      "name": "Amprius",
+      "layer": "storage_batteries",
+      "subcategory": "silicon_nanowire_batteries"
+    },
+    {
+      "symbol": "EOSE",
+      "name": "Eos Energy",
+      "layer": "storage_batteries",
+      "subcategory": "zinc_battery_storage"
+    },
+    {
       "symbol": "TSM",
       "name": "TSMC",
       "layer": "foundries_memory",
@@ -253,6 +273,12 @@ export const TOPOLOGY: Topology = {
       "notes": "ETF holding SK hynix, MU, Samsung, SNDK, Kioxia, STX, WDC, Nanya, Winbond"
     },
     {
+      "symbol": "SIMO",
+      "name": "Silicon Motion",
+      "layer": "foundries_memory",
+      "subcategory": "ssd_controllers"
+    },
+    {
       "symbol": "NVDA",
       "name": "NVIDIA",
       "layer": "chip_design",
@@ -272,6 +298,32 @@ export const TOPOLOGY: Topology = {
       "notes": "Also operates fabs (IDM model)"
     },
     {
+      "symbol": "AMBQ",
+      "name": "Ambiq Micro",
+      "layer": "chip_design",
+      "subcategory": "ultra_low_power_ai",
+      "notes": "Ultra-low-power AI chips, recent IPO"
+    },
+    {
+      "symbol": "NVTS",
+      "name": "Navitas Semiconductor",
+      "layer": "chip_design",
+      "subcategory": "gan_power"
+    },
+    {
+      "symbol": "ARM",
+      "name": "ARM Holdings",
+      "layer": "chip_design",
+      "subcategory": "ip_licensing"
+    },
+    {
+      "symbol": "WOLF",
+      "name": "Wolfspeed",
+      "layer": "chip_design",
+      "subcategory": "silicon_carbide",
+      "notes": "Silicon carbide; financial restructuring risk"
+    },
+    {
       "symbol": "IONQ",
       "name": "IonQ",
       "layer": "quantum",
@@ -288,6 +340,38 @@ export const TOPOLOGY: Topology = {
       "name": "Rigetti Computing",
       "layer": "quantum",
       "subcategory": "superconducting"
+    },
+    {
+      "symbol": "LITE",
+      "name": "Lumentum",
+      "layer": "photonics",
+      "subcategory": "optical_components"
+    },
+    {
+      "symbol": "COHR",
+      "name": "Coherent Corp",
+      "layer": "photonics",
+      "subcategory": "lasers_photonics"
+    },
+    {
+      "symbol": "AAOI",
+      "name": "Applied Optoelectronics",
+      "layer": "photonics",
+      "subcategory": "datacom_transceivers",
+      "notes": "History of guidance misses"
+    },
+    {
+      "symbol": "AXTI",
+      "name": "AXT Inc",
+      "layer": "photonics",
+      "subcategory": "compound_semi_substrates"
+    },
+    {
+      "symbol": "LWLG",
+      "name": "Lightwave Logic",
+      "layer": "photonics",
+      "subcategory": "electro_optic_polymers",
+      "notes": "Pre-revenue, speculative"
     },
     {
       "symbol": "DELL",
@@ -390,6 +474,25 @@ export const TOPOLOGY: Topology = {
       "name": "Unusual Machines",
       "layer": "applications",
       "subcategory": "drones"
+    },
+    {
+      "symbol": "SATL",
+      "name": "Satellogic",
+      "layer": "applications",
+      "subcategory": "earth_observation"
+    },
+    {
+      "symbol": "PLTR",
+      "name": "Palantir",
+      "layer": "applications",
+      "subcategory": "ai_software"
+    },
+    {
+      "symbol": "OSS",
+      "name": "One Stop Systems",
+      "layer": "applications",
+      "subcategory": "edge_compute_defense",
+      "notes": "Micro-cap, illiquid"
     }
   ],
   "edges": [
@@ -761,6 +864,133 @@ export const TOPOLOGY: Topology = {
       "to": "AMZN",
       "type": "compute_capacity",
       "note": "Overlapping market for AI compute"
+    },
+    {
+      "from": "LITE",
+      "to": "CRWV",
+      "type": "optical_transceiver"
+    },
+    {
+      "from": "LITE",
+      "to": "NBIS",
+      "type": "optical_transceiver"
+    },
+    {
+      "from": "LITE",
+      "to": "DELL",
+      "type": "optical_components"
+    },
+    {
+      "from": "COHR",
+      "to": "CRWV",
+      "type": "optical_transceiver"
+    },
+    {
+      "from": "COHR",
+      "to": "NBIS",
+      "type": "optical_transceiver"
+    },
+    {
+      "from": "COHR",
+      "to": "DELL",
+      "type": "optical_components"
+    },
+    {
+      "from": "AAOI",
+      "to": "CRWV",
+      "type": "datacom_optics"
+    },
+    {
+      "from": "AAOI",
+      "to": "NBIS",
+      "type": "datacom_optics"
+    },
+    {
+      "from": "AXTI",
+      "to": "LITE",
+      "type": "substrate_supply"
+    },
+    {
+      "from": "AXTI",
+      "to": "COHR",
+      "type": "substrate_supply"
+    },
+    {
+      "from": "AXTI",
+      "to": "NVTS",
+      "type": "substrate_supply"
+    },
+    {
+      "from": "AMPX",
+      "to": "TSLA",
+      "type": "battery_supply"
+    },
+    {
+      "from": "EOSE",
+      "to": "CRWV",
+      "type": "grid_storage",
+      "note": "Zinc BESS for datacenter resilience"
+    },
+    {
+      "from": "SIMO",
+      "to": "SNDK",
+      "type": "controller_supply"
+    },
+    {
+      "from": "SIMO",
+      "to": "WDC",
+      "type": "controller_supply"
+    },
+    {
+      "from": "NVTS",
+      "to": "VICR",
+      "type": "power_chip_supply",
+      "note": "GaN in power conversion stages"
+    },
+    {
+      "from": "ARM",
+      "to": "NVDA",
+      "type": "ip_licensing",
+      "note": "ARM ISA in Grace CPU"
+    },
+    {
+      "from": "ARM",
+      "to": "AMD",
+      "type": "ip_licensing"
+    },
+    {
+      "from": "ARM",
+      "to": "AMBQ",
+      "type": "ip_licensing"
+    },
+    {
+      "from": "WOLF",
+      "to": "TSLA",
+      "type": "sic_inverters",
+      "note": "SiC in EV powertrains"
+    },
+    {
+      "from": "PLTR",
+      "to": "AMZN",
+      "type": "ai_software",
+      "note": "AI/data platforms; loose edge"
+    },
+    {
+      "from": "NVDA",
+      "to": "PLTR",
+      "type": "gpu_supply",
+      "note": "PLTR uses GPU compute"
+    },
+    {
+      "from": "NVDA",
+      "to": "OSS",
+      "type": "edge_compute_chips"
+    },
+    {
+      "from": "SATL",
+      "to": "PL",
+      "type": "peer_overlap",
+      "note": "Both Earth observation; loose"
     }
   ],
   "macroSignals": [
@@ -815,6 +1045,31 @@ export const TOPOLOGY: Topology = {
         "XE"
       ],
       "yfinanceProxy": "ICLN"
+    },
+    {
+      "id": "ten_year_yield",
+      "affects": [],
+      "yfinanceProxy": "^TNX"
+    },
+    {
+      "id": "usd_index",
+      "affects": [],
+      "yfinanceProxy": "DX-Y.NYB"
+    },
+    {
+      "id": "vix",
+      "affects": [],
+      "yfinanceProxy": "^VIX"
+    },
+    {
+      "id": "hyg",
+      "affects": [],
+      "yfinanceProxy": "HYG"
+    },
+    {
+      "id": "lqd",
+      "affects": [],
+      "yfinanceProxy": "LQD"
     }
   ],
   "benchmarkEtfs": [
