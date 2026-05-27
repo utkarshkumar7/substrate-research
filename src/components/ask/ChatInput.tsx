@@ -1,10 +1,23 @@
 import { useRef, useEffect } from "react"
 
-const SUGGESTED_CHIPS = [
-  "What's hot today?",
-  "Restructure my portfolio",
-  "Which layer has the most momentum?",
-  "Any correlation breaks this week?",
+const OPTION_TEMPLATE = `Should I buy <TICKER> <EXP_DATE> $<STRIKE> CALL at $<PRICE>?
+Robinhood quotes: bid $X, ask $Y, IV Z%, volume V, OI N.`
+
+const SIGNAL_TEMPLATE = `Signal from <source>:
+
+<paste tweet/content here>`
+
+interface Chip {
+  label: string
+  prefill?: string
+  send?: string
+}
+
+const CHIPS: Chip[] = [
+  { label: "Analyze an option I'm considering", prefill: OPTION_TEMPLATE },
+  { label: "Review a signal/tweet", prefill: SIGNAL_TEMPLATE },
+  { label: "What's hot today?", send: "What's hot today?" },
+  { label: "Restructure my holdings", send: "Restructure my holdings" },
 ]
 
 interface Props {
@@ -39,6 +52,16 @@ export default function ChatInput({
     }
   }
 
+  const handleChip = (chip: Chip) => {
+    if (isStreaming) return
+    if (chip.prefill) {
+      setInput(chip.prefill)
+      setTimeout(() => textareaRef.current?.focus(), 0)
+    } else if (chip.send) {
+      onSend(chip.send)
+    }
+  }
+
   const canSend = input.trim().length > 0 && !isStreaming
 
   return (
@@ -49,15 +72,15 @@ export default function ChatInput({
       {/* Chips */}
       {chipsVisible && (
         <div className="flex flex-wrap gap-2 mb-3">
-          {SUGGESTED_CHIPS.map((chip) => (
+          {CHIPS.map((chip) => (
             <button
-              key={chip}
-              onClick={() => onSend(chip)}
+              key={chip.label}
+              onClick={() => handleChip(chip)}
               disabled={isStreaming}
               className="rounded-full border border-border text-text-secondary hover:border-accent hover:text-accent transition-colors"
               style={{ fontSize: 12, padding: "4px 12px", background: "#16171c" }}
             >
-              {chip}
+              {chip.label}
             </button>
           ))}
         </div>
