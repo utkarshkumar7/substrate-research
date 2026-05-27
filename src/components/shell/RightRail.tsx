@@ -6,6 +6,7 @@ import { pctForPeriod } from "@/lib/analytics/performance"
 import { formatPercent } from "@/lib/format"
 import InsightList from "@/components/insights/InsightList"
 import HoldingsList from "@/components/portfolio/HoldingsList"
+import MacroStrip from "@/components/shell/MacroStrip"
 
 // ─── Layer health ─────────────────────────────────────────────────────────────
 
@@ -124,6 +125,7 @@ const SHORT: Record<string, string> = {
   foundries_memory: "Foundries",
   chip_design:      "Chip Design",
   quantum:          "Quantum",
+  photonics:        "Photonics",
   datacenter_infra: "Datacenter",
   applications:     "Applications",
 }
@@ -136,6 +138,14 @@ export default function RightRail() {
       className="bg-bg-card border-l border-border overflow-y-auto flex-shrink-0"
       style={{ width: 280, padding: "20px 16px" }}
     >
+      <Section title="Macro">
+        <Suspense fallback={<RailSkeleton />}>
+          <MacroStrip />
+        </Suspense>
+      </Section>
+
+      <div className="border-t border-border mb-5" />
+
       <Section title="Layer Health (5d)">
         <Suspense fallback={<RailSkeleton />}>
           <LayerHealthPanel />

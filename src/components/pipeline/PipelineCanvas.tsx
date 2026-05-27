@@ -22,6 +22,7 @@ const SHORT: Record<string, string> = {
   foundries_memory: "Foundries",
   chip_design:      "Chip Design",
   quantum:          "Quantum",
+  photonics:        "Photonics",
   datacenter_infra: "Datacenter",
   applications:     "Applications",
 }
