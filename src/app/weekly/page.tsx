@@ -1,10 +1,21 @@
-export default function uweeklyPage() {
-  return (
-    <div className="p-6">
-      <h1 className="font-semibold tracking-tight mb-2" style={{ fontSize: 22 }}>
-        uweekly
-      </h1>
-      <p className="text-text-muted" style={{ fontSize: 13 }}>Coming soon.</p>
-    </div>
-  );
+import { createClient } from "@/lib/supabase/server"
+import WeeklyClient from "./WeeklyClient"
+
+export const metadata = { title: "Weekly Review" }
+
+async function getLatestWeekly() {
+  const client = createClient()
+  const { data } = await client
+    .from("insights")
+    .select("id, title, body, created_at")
+    .eq("kind", "weekly")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  return data
+}
+
+export default async function WeeklyPage() {
+  const latest = await getLatestWeekly()
+  return <WeeklyClient latest={latest} />
 }

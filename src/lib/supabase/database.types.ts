@@ -15,6 +15,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      journal_entries: {
+        Row: {
+          id: string
+          created_at: string
+          updated_at: string
+          symbol: string | null
+          direction: string | null
+          status: string
+          entry_price: number | null
+          exit_price: number | null
+          shares: number | null
+          thesis: string
+          outcome_notes: string | null
+          tags: string[]
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          symbol?: string | null
+          direction?: string | null
+          status?: string
+          entry_price?: number | null
+          exit_price?: number | null
+          shares?: number | null
+          thesis: string
+          outcome_notes?: string | null
+          tags?: string[]
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          symbol?: string | null
+          direction?: string | null
+          status?: string
+          entry_price?: number | null
+          exit_price?: number | null
+          shares?: number | null
+          thesis?: string
+          outcome_notes?: string | null
+          tags?: string[]
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           created_at: string

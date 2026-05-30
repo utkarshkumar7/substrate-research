@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { getHeatmapSnapshot } from "@/lib/queries/prices"
 import { getRecentInsights } from "@/lib/queries/insights"
 import { getHoldingsWithPrices } from "@/lib/queries/holdings"
+import { getJournalEntries } from "@/lib/queries/journal"
 import { topology, layersInOrder, tickersByLayer, fetchableSymbols } from "@/lib/topology"
 import { pctForPeriod, medianPct } from "@/lib/analytics/performance"
 import { formatPercent } from "@/lib/format"
@@ -57,11 +58,21 @@ async function buildSystemPrompt(supabase: SupabaseClient<Database>): Promise<st
     ? insights.map((i) => `  [${i.kind}] ${i.title}`).join("\n")
     : "  none"
 
-  // User holdings (optional context)
-  const holdings = await getHoldingsWithPrices(supabase)
+  // User holdings + journal
+  const [holdings, journalEntries] = await Promise.all([
+    getHoldingsWithPrices(supabase),
+    getJournalEntries(supabase, 10),
+  ])
   const holdingsSection = holdings.length
     ? `\nUSER HOLDINGS:\n${holdings
         .map((h) => `  ${h.symbol}: ${h.shares} sh  $${h.latestPrice?.toFixed(2) ?? "?"}  P&L: ${h.pnlPct != null ? formatPercent(h.pnlPct, 1) + "%" : "—"}`)
+        .join("\n")}`
+    : ""
+
+  const openJournal = journalEntries.filter(e => e.status !== "closed")
+  const journalSection = openJournal.length
+    ? `\nOPEN TRADE JOURNAL:\n${openJournal
+        .map(e => `  [${e.status}] ${e.symbol ?? "general"} ${e.direction ? `(${e.direction})` : ""}: ${e.thesis.slice(0, 200)}`)
         .join("\n")}`
     : ""
 
@@ -82,7 +93,7 @@ TOP MOVERS TODAY (1d):
 ${movers}
 
 RECENT SIGNALS:
-${signalLines}${holdingsSection}
+${signalLines}${holdingsSection}${journalSection}
 
 Answer using specific tickers and layers from the data above. Be concise and direct.
 
