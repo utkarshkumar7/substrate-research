@@ -493,6 +493,33 @@ export const TOPOLOGY: Topology = {
       "layer": "applications",
       "subcategory": "edge_compute_defense",
       "notes": "Micro-cap, illiquid"
+    },
+    {
+      "symbol": "GOOGL",
+      "name": "Alphabet",
+      "layer": "applications",
+      "subcategory": "hyperscaler_ai",
+      "notes": "Cloud + Gemini AI + TPU custom silicon"
+    },
+    {
+      "symbol": "NOW",
+      "name": "ServiceNow",
+      "layer": "applications",
+      "subcategory": "enterprise_ai_software"
+    },
+    {
+      "symbol": "HOOD",
+      "name": "Robinhood",
+      "layer": "applications",
+      "subcategory": "fintech",
+      "notes": "Watchlist only; high beta to risk-on sentiment"
+    },
+    {
+      "symbol": "SOFI",
+      "name": "SoFi Technologies",
+      "layer": "applications",
+      "subcategory": "fintech",
+      "notes": "Watchlist only; very high beta"
     }
   ],
   "edges": [

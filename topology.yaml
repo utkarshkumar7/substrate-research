@@ -433,6 +433,29 @@ tickers:
     subcategory: edge_compute_defense
     notes: "Micro-cap, illiquid"
 
+  - symbol: GOOGL
+    name: "Alphabet"
+    layer: applications
+    subcategory: hyperscaler_ai
+    notes: "Cloud + Gemini AI + TPU custom silicon"
+
+  - symbol: NOW
+    name: "ServiceNow"
+    layer: applications
+    subcategory: enterprise_ai_software
+
+  - symbol: HOOD
+    name: "Robinhood"
+    layer: applications
+    subcategory: fintech
+    notes: "Watchlist only; high beta to risk-on sentiment"
+
+  - symbol: SOFI
+    name: "SoFi Technologies"
+    layer: applications
+    subcategory: fintech
+    notes: "Watchlist only; very high beta"
+
 # Edges encode supply chain dependencies (from -> to means "from supplies to").
 # Types: foundry_fab, memory_supply, power_supply, materials, components,
 #        compute_capacity, software_substrate
