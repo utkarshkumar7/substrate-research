@@ -72,7 +72,14 @@ async function buildSystemPrompt(supabase: SupabaseClient<Database>): Promise<st
   const openJournal = journalEntries.filter(e => e.status !== "closed")
   const journalSection = openJournal.length
     ? `\nOPEN TRADE JOURNAL:\n${openJournal
-        .map(e => `  [${e.status}] ${e.symbol ?? "general"} ${e.direction ? `(${e.direction})` : ""}: ${e.thesis.slice(0, 200)}`)
+        .map(e => {
+          const dir = e.direction ? `(${e.direction})` : ""
+          const optParts = (e.direction === "call" || e.direction === "put")
+            ? [e.strike ? `$${e.strike}` : "", e.expiry ? `exp ${new Date(e.expiry + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}` : ""].filter(Boolean).join(" ")
+            : ""
+          const optStr = optParts ? ` ${optParts}` : ""
+          return `  [${e.status}] ${e.symbol ?? "general"} ${dir}${optStr}: ${e.thesis.slice(0, 200)}`
+        })
         .join("\n")}`
     : ""
 

@@ -29,6 +29,22 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
 }
 
+function formatExpiry(iso: string) {
+  // "2026-06-20" → "Jun 20"
+  const [, month, day] = iso.split("-")
+  const d = new Date(parseInt(iso.split("-")[0]), parseInt(month) - 1, parseInt(day))
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+}
+
+function optionSummary(entry: JournalEntry): string | null {
+  if (entry.direction !== "call" && entry.direction !== "put") return null
+  if (!entry.strike && !entry.expiry) return null
+  const suffix = entry.direction === "call" ? "C" : "P"
+  const strike = entry.strike ? `$${entry.strike}` : ""
+  const exp = entry.expiry ? formatExpiry(entry.expiry) : ""
+  return [exp, strike + suffix].filter(Boolean).join(" ")
+}
+
 interface Props {
   initialEntries: JournalEntry[]
 }
@@ -41,6 +57,8 @@ const EMPTY_FORM = {
   shares: "",
   thesis: "",
   tags: "",
+  expiry: "",
+  strike: "",
 }
 
 export default function JournalClient({ initialEntries }: Props) {
@@ -53,6 +71,8 @@ export default function JournalClient({ initialEntries }: Props) {
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
+  const isOption = form.direction === "call" || form.direction === "put"
+
   const handleSubmit = () => {
     if (!form.thesis.trim()) return
     const entry = {
@@ -63,6 +83,8 @@ export default function JournalClient({ initialEntries }: Props) {
       shares: form.shares ? parseFloat(form.shares) : null,
       thesis: form.thesis.trim(),
       tags: form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean) : [],
+      expiry: isOption && form.expiry ? form.expiry : null,
+      strike: isOption && form.strike ? parseFloat(form.strike) : null,
     }
     startTransition(async () => {
       await addEntry(entry)
@@ -227,6 +249,31 @@ export default function JournalClient({ initialEntries }: Props) {
                 style={{ fontSize: 13, padding: "7px 10px" }}
               />
             </div>
+            {isOption && (
+              <>
+                <div>
+                  <label className="text-text-muted block mb-1" style={{ fontSize: 11 }}>Strike</label>
+                  <input
+                    value={form.strike}
+                    onChange={e => setForm(f => ({ ...f, strike: e.target.value }))}
+                    placeholder="230"
+                    type="number"
+                    className="w-full rounded border border-border bg-bg text-text font-mono outline-none focus:border-border-strong"
+                    style={{ fontSize: 13, padding: "7px 10px" }}
+                  />
+                </div>
+                <div>
+                  <label className="text-text-muted block mb-1" style={{ fontSize: 11 }}>Expiry</label>
+                  <input
+                    value={form.expiry}
+                    onChange={e => setForm(f => ({ ...f, expiry: e.target.value }))}
+                    type="date"
+                    className="w-full rounded border border-border bg-bg text-text font-mono outline-none focus:border-border-strong"
+                    style={{ fontSize: 13, padding: "7px 10px" }}
+                  />
+                </div>
+              </>
+            )}
           </div>
 
           <div className="mb-3">
@@ -287,6 +334,7 @@ export default function JournalClient({ initialEntries }: Props) {
     onStartClose: () => void
     onDelete: () => void
   }) {
+    const optSummary = optionSummary(entry)
     return (
       <div className="rounded-xl border border-border bg-bg-card overflow-hidden">
         <div
@@ -314,6 +362,11 @@ export default function JournalClient({ initialEntries }: Props) {
                   {DIRECTION_LABEL[entry.direction]}
                 </span>
               )}
+              {optSummary && (
+                <span className="font-mono text-text-secondary" style={{ fontSize: 11 }}>
+                  {optSummary}
+                </span>
+              )}
               {entry.tags.map(tag => (
                 <span key={tag} className="rounded px-1.5 py-0.5 text-text-muted border border-border" style={{ fontSize: 10 }}>
                   {tag}
@@ -335,11 +388,13 @@ export default function JournalClient({ initialEntries }: Props) {
               {entry.thesis}
             </p>
 
-            {(entry.entry_price || entry.shares || entry.exit_price) && (
-              <div className="flex gap-6 mb-3 font-mono" style={{ fontSize: 12 }}>
+            {(entry.entry_price || entry.shares || entry.exit_price || entry.strike || entry.expiry) && (
+              <div className="flex gap-6 mb-3 font-mono flex-wrap" style={{ fontSize: 12 }}>
                 {entry.entry_price && <span className="text-text-muted">Entry: <span className="text-text">${entry.entry_price}</span></span>}
                 {entry.shares && <span className="text-text-muted">Shares: <span className="text-text">{entry.shares}</span></span>}
                 {entry.exit_price && <span className="text-text-muted">Exit: <span className="text-text">${entry.exit_price}</span></span>}
+                {entry.strike && <span className="text-text-muted">Strike: <span className="text-text">${entry.strike}</span></span>}
+                {entry.expiry && <span className="text-text-muted">Exp: <span className="text-text">{formatExpiry(entry.expiry)}</span></span>}
               </div>
             )}
 

@@ -29,6 +29,8 @@ export type Database = {
           thesis: string
           outcome_notes: string | null
           tags: string[]
+          expiry: string | null
+          strike: number | null
         }
         Insert: {
           id?: string
@@ -43,6 +45,8 @@ export type Database = {
           thesis: string
           outcome_notes?: string | null
           tags?: string[]
+          expiry?: string | null
+          strike?: number | null
         }
         Update: {
           id?: string
@@ -57,6 +61,8 @@ export type Database = {
           thesis?: string
           outcome_notes?: string | null
           tags?: string[]
+          expiry?: string | null
+          strike?: number | null
         }
         Relationships: []
       }
