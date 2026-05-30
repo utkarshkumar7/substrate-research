@@ -174,7 +174,7 @@ export default function PortfolioClient({ holdings: initialHoldings, slices: ini
                                 className="font-mono"
                                 style={{ fontSize: 10, color: h.pnlAbs >= 0 ? "#4ade80" : "#f87171" }}
                               >
-                                {h.pnlAbs >= 0 ? "+" : ""}{formatCurrency(Math.abs(h.pnlAbs))}
+                                {h.pnlAbs >= 0 ? "+" : "-"}{formatCurrency(Math.abs(h.pnlAbs))}
                               </div>
                             )}
                           </div>

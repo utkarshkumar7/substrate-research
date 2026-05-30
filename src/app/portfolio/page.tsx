@@ -4,25 +4,27 @@ import PortfolioClient, { type PortfolioHolding } from "@/components/portfolio/P
 import type { LayerSlice } from "@/components/portfolio/PortfolioDonut"
 
 const LAYER_COLORS: Record<string, string> = {
-  raw_materials: "#b45309",
-  energy: "#ea580c",
-  storage_batteries: "#e11d48",
+  raw_materials:    "#b45309",
+  energy:           "#ea580c",
+  storage_batteries:"#e11d48",
   foundries_memory: "#2563eb",
-  chip_design: "#4f46e5",
-  quantum: "#7c3aed",
+  chip_design:      "#4f46e5",
+  quantum:          "#7c3aed",
+  photonics:        "#0ea5e9",
   datacenter_infra: "#0d9488",
-  applications: "#16a34a",
+  applications:     "#16a34a",
 }
 
 const LAYER_LABELS: Record<string, string> = {
-  raw_materials: "Raw Materials",
-  energy: "Energy",
-  storage_batteries: "Storage",
+  raw_materials:    "Raw Materials",
+  energy:           "Energy",
+  storage_batteries:"Storage",
   foundries_memory: "Foundries & Memory",
-  chip_design: "Chip Design",
-  quantum: "Quantum",
+  chip_design:      "Chip Design",
+  quantum:          "Quantum",
+  photonics:        "Photonics",
   datacenter_infra: "Datacenter",
-  applications: "Applications",
+  applications:     "Applications",
 }
 
 export default async function PortfolioPage() {

@@ -1,8 +1,22 @@
 "use client";
 
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Search, RefreshCw } from "lucide-react";
 
 export default function TopBar() {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [spinning, setSpinning] = useState(false);
+
+  const handleRefresh = () => {
+    setSpinning(true);
+    startTransition(() => {
+      router.refresh();
+      setTimeout(() => setSpinning(false), 800);
+    });
+  };
+
   return (
     <header
       className="flex items-center gap-0 px-6 bg-bg-card border-b border-border sticky top-0 z-50"
@@ -51,10 +65,17 @@ export default function TopBar() {
           EOD data · {new Date().toISOString().slice(0, 10)}
         </div>
         <button
+          onClick={handleRefresh}
+          disabled={isPending}
           className="flex items-center gap-1.5 px-3 py-1.5 bg-bg border border-border rounded text-text hover:bg-bg-hover transition-colors"
-          style={{ fontSize: 12 }}
+          style={{ fontSize: 12, cursor: isPending ? "not-allowed" : "pointer" }}
         >
-          <RefreshCw style={{ width: 12, height: 12 }} />
+          <RefreshCw
+            style={{
+              width: 12, height: 12,
+              animation: spinning ? "spin 0.8s linear infinite" : "none",
+            }}
+          />
           Refresh
         </button>
       </div>

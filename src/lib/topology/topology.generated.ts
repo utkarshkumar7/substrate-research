@@ -406,6 +406,13 @@ export const TOPOLOGY: Topology = {
       "notes": "Bitcoin miner pivoting to AI compute hosting"
     },
     {
+      "symbol": "BMNR",
+      "name": "BitMine Immersion Technologies",
+      "layer": "datacenter_infra",
+      "subcategory": "immersion_cooling",
+      "notes": "Immersion cooling + BTC mining"
+    },
+    {
       "symbol": "HUT",
       "name": "Hut 8",
       "layer": "datacenter_infra",
