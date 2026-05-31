@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState, useTransition, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import type { JournalEntry } from "@/lib/queries/journal"
 import { addEntry, updateEntry, removeEntry } from "./actions"
@@ -30,10 +30,8 @@ function formatDate(iso: string) {
 }
 
 function formatExpiry(iso: string) {
-  // "2026-06-20" → "Jun 20"
-  const [, month, day] = iso.split("-")
-  const d = new Date(parseInt(iso.split("-")[0]), parseInt(month) - 1, parseInt(day))
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+  const [y, m, d] = iso.split("-").map(Number)
+  return new Date(y, m - 1, d).toLocaleDateString("en-US", { month: "short", day: "numeric" })
 }
 
 function optionSummary(entry: JournalEntry): string | null {
@@ -45,8 +43,33 @@ function optionSummary(entry: JournalEntry): string | null {
   return [exp, strike + suffix].filter(Boolean).join(" ")
 }
 
+function moneynessInfo(
+  entry: JournalEntry,
+  latestPrices: Record<string, number>
+): { label: string; pct: number; color: string } | null {
+  if ((entry.direction !== "call" && entry.direction !== "put") || !entry.strike || !entry.symbol) return null
+  const price = latestPrices[entry.symbol]
+  if (price == null) return null
+  const strike = entry.strike
+  const isCall = entry.direction === "call"
+  // positive = in-the-money
+  const itm = isCall ? price - strike : strike - price
+  const pct = (itm / strike) * 100
+  if (Math.abs(pct) < 1) return { label: "ATM", pct, color: "#71717a" }
+  if (itm > 0) return { label: "ITM", pct, color: "#4ade80" }
+  return { label: "OTM", pct, color: "#f87171" }
+}
+
+interface Prefill {
+  symbol: string
+  status: string
+  direction: string
+}
+
 interface Props {
   initialEntries: JournalEntry[]
+  latestPrices?: Record<string, number>
+  prefill?: Prefill
 }
 
 const EMPTY_FORM = {
@@ -61,17 +84,45 @@ const EMPTY_FORM = {
   strike: "",
 }
 
-export default function JournalClient({ initialEntries }: Props) {
+function entryToForm(e: JournalEntry) {
+  return {
+    symbol: e.symbol ?? "",
+    direction: e.direction ?? "long",
+    status: e.status,
+    entry_price: e.entry_price != null ? String(e.entry_price) : "",
+    shares: e.shares != null ? String(e.shares) : "",
+    thesis: e.thesis,
+    tags: (e.tags ?? []).join(", "),
+    expiry: e.expiry ?? "",
+    strike: e.strike != null ? String(e.strike) : "",
+  }
+}
+
+export default function JournalClient({ initialEntries, latestPrices = {}, prefill }: Props) {
   const [entries, setEntries] = useState(initialEntries)
-  const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState(EMPTY_FORM)
+  const [showForm, setShowForm] = useState(!!prefill)
+  const [form, setForm] = useState(prefill ? { ...EMPTY_FORM, symbol: prefill.symbol, status: prefill.status, direction: prefill.direction } : EMPTY_FORM)
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editForm, setEditForm] = useState(EMPTY_FORM)
   const [closingId, setClosingId] = useState<string | null>(null)
   const [outcomeText, setOutcomeText] = useState("")
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
+  // Clear prefill params from URL after consuming them
+  useEffect(() => {
+    if (prefill) {
+      const url = new URL(window.location.href)
+      url.searchParams.delete("symbol")
+      url.searchParams.delete("status")
+      url.searchParams.delete("direction")
+      window.history.replaceState({}, "", url.toString())
+    }
+  }, [])
+
   const isOption = form.direction === "call" || form.direction === "put"
+  const isEditOption = editForm.direction === "call" || editForm.direction === "put"
 
   const handleSubmit = () => {
     if (!form.thesis.trim()) return
@@ -90,6 +141,26 @@ export default function JournalClient({ initialEntries }: Props) {
       await addEntry(entry)
       setForm(EMPTY_FORM)
       setShowForm(false)
+      router.refresh()
+    })
+  }
+
+  const handleSaveEdit = (id: string) => {
+    if (!editForm.thesis.trim()) return
+    const updates = {
+      symbol: editForm.symbol.trim().toUpperCase() || null,
+      direction: editForm.direction || null,
+      status: editForm.status,
+      entry_price: editForm.entry_price ? parseFloat(editForm.entry_price) : null,
+      shares: editForm.shares ? parseFloat(editForm.shares) : null,
+      thesis: editForm.thesis.trim(),
+      tags: editForm.tags ? editForm.tags.split(",").map(t => t.trim()).filter(Boolean) : [],
+      expiry: isEditOption && editForm.expiry ? editForm.expiry : null,
+      strike: isEditOption && editForm.strike ? parseFloat(editForm.strike) : null,
+    }
+    startTransition(async () => {
+      await updateEntry(id, updates)
+      setEditingId(null)
       router.refresh()
     })
   }
@@ -128,12 +199,23 @@ export default function JournalClient({ initialEntries }: Props) {
               key={entry.id}
               entry={entry}
               expanded={expandedId === entry.id}
-              onToggle={() => setExpandedId(expandedId === entry.id ? null : entry.id)}
+              editing={editingId === entry.id}
+              onToggle={() => {
+                setExpandedId(expandedId === entry.id ? null : entry.id)
+                setEditingId(null)
+              }}
               onAskClaude={() => {
                 const prompt = `Journal entry review — ${entry.symbol ?? "general"}: ${entry.thesis}${entry.status === "open" ? ". Should I adjust this position?" : ""}`
                 router.push(`/ask?q=${encodeURIComponent(prompt)}`)
               }}
               onStartClose={() => { setClosingId(entry.id); setOutcomeText("") }}
+              onStartEdit={() => {
+                setEditingId(entry.id)
+                setEditForm(entryToForm(entry))
+                setExpandedId(entry.id)
+              }}
+              onCancelEdit={() => setEditingId(null)}
+              onSaveEdit={() => handleSaveEdit(entry.id)}
               onDelete={() => handleDelete(entry.id)}
             />
           ))}
@@ -184,7 +266,7 @@ export default function JournalClient({ initialEntries }: Props) {
           </p>
         </div>
         <button
-          onClick={() => setShowForm(v => !v)}
+          onClick={() => { setShowForm(v => !v); setForm(EMPTY_FORM) }}
           className="rounded-lg border transition-colors"
           style={{
             fontSize: 13, padding: "7px 16px", fontWeight: 500,
@@ -201,103 +283,7 @@ export default function JournalClient({ initialEntries }: Props) {
       {/* New entry form */}
       {showForm && (
         <div className="mb-8 p-5 rounded-xl border border-border bg-bg-card">
-          <div className="grid grid-cols-2 gap-3 mb-3">
-            <div>
-              <label className="text-text-muted block mb-1" style={{ fontSize: 11 }}>Symbol</label>
-              <input
-                value={form.symbol}
-                onChange={e => setForm(f => ({ ...f, symbol: e.target.value }))}
-                placeholder="NVDA"
-                className="w-full rounded border border-border bg-bg text-text font-mono outline-none focus:border-border-strong"
-                style={{ fontSize: 13, padding: "7px 10px" }}
-              />
-            </div>
-            <div>
-              <label className="text-text-muted block mb-1" style={{ fontSize: 11 }}>Direction</label>
-              <select
-                value={form.direction}
-                onChange={e => setForm(f => ({ ...f, direction: e.target.value }))}
-                className="w-full rounded border border-border bg-bg text-text outline-none focus:border-border-strong"
-                style={{ fontSize: 13, padding: "7px 10px" }}
-              >
-                <option value="long">Long</option>
-                <option value="short">Short</option>
-                <option value="call">Call option</option>
-                <option value="put">Put option</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-text-muted block mb-1" style={{ fontSize: 11 }}>Status</label>
-              <select
-                value={form.status}
-                onChange={e => setForm(f => ({ ...f, status: e.target.value }))}
-                className="w-full rounded border border-border bg-bg text-text outline-none focus:border-border-strong"
-                style={{ fontSize: 13, padding: "7px 10px" }}
-              >
-                <option value="watching">Watching</option>
-                <option value="open">Open (in trade)</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-text-muted block mb-1" style={{ fontSize: 11 }}>Entry price</label>
-              <input
-                value={form.entry_price}
-                onChange={e => setForm(f => ({ ...f, entry_price: e.target.value }))}
-                placeholder="225.00"
-                type="number"
-                className="w-full rounded border border-border bg-bg text-text font-mono outline-none focus:border-border-strong"
-                style={{ fontSize: 13, padding: "7px 10px" }}
-              />
-            </div>
-            {isOption && (
-              <>
-                <div>
-                  <label className="text-text-muted block mb-1" style={{ fontSize: 11 }}>Strike</label>
-                  <input
-                    value={form.strike}
-                    onChange={e => setForm(f => ({ ...f, strike: e.target.value }))}
-                    placeholder="230"
-                    type="number"
-                    className="w-full rounded border border-border bg-bg text-text font-mono outline-none focus:border-border-strong"
-                    style={{ fontSize: 13, padding: "7px 10px" }}
-                  />
-                </div>
-                <div>
-                  <label className="text-text-muted block mb-1" style={{ fontSize: 11 }}>Expiry</label>
-                  <input
-                    value={form.expiry}
-                    onChange={e => setForm(f => ({ ...f, expiry: e.target.value }))}
-                    type="date"
-                    className="w-full rounded border border-border bg-bg text-text font-mono outline-none focus:border-border-strong"
-                    style={{ fontSize: 13, padding: "7px 10px" }}
-                  />
-                </div>
-              </>
-            )}
-          </div>
-
-          <div className="mb-3">
-            <label className="text-text-muted block mb-1" style={{ fontSize: 11 }}>Thesis <span className="text-down">*</span></label>
-            <textarea
-              value={form.thesis}
-              onChange={e => setForm(f => ({ ...f, thesis: e.target.value }))}
-              placeholder="Why are you considering this trade? What's the setup, catalyst, and risk?"
-              className="w-full rounded border border-border bg-bg text-text resize-none outline-none focus:border-border-strong"
-              style={{ fontSize: 13, padding: "8px 10px", minHeight: 96, lineHeight: 1.6 }}
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="text-text-muted block mb-1" style={{ fontSize: 11 }}>Tags (comma-separated)</label>
-            <input
-              value={form.tags}
-              onChange={e => setForm(f => ({ ...f, tags: e.target.value }))}
-              placeholder="pullback, earnings, macro"
-              className="w-full rounded border border-border bg-bg text-text outline-none focus:border-border-strong"
-              style={{ fontSize: 13, padding: "7px 10px" }}
-            />
-          </div>
-
+          <EntryForm form={form} setForm={setForm} isOption={isOption} />
           <button
             onClick={handleSubmit}
             disabled={isPending || !form.thesis.trim()}
@@ -326,22 +312,30 @@ export default function JournalClient({ initialEntries }: Props) {
     </div>
   )
 
-  function EntryCard({ entry, expanded, onToggle, onAskClaude, onStartClose, onDelete }: {
+  function EntryCard({
+    entry, expanded, editing,
+    onToggle, onAskClaude, onStartClose, onStartEdit, onCancelEdit, onSaveEdit, onDelete,
+  }: {
     entry: JournalEntry
     expanded: boolean
+    editing: boolean
     onToggle: () => void
     onAskClaude: () => void
     onStartClose: () => void
+    onStartEdit: () => void
+    onCancelEdit: () => void
+    onSaveEdit: () => void
     onDelete: () => void
   }) {
     const optSummary = optionSummary(entry)
+    const moneyness = entry.status !== "closed" ? moneynessInfo(entry, latestPrices) : null
+
     return (
       <div className="rounded-xl border border-border bg-bg-card overflow-hidden">
         <div
           className="flex items-start gap-3 p-4 cursor-pointer hover:bg-bg-hover transition-colors"
           onClick={onToggle}
         >
-          {/* Status dot */}
           <span
             className="mt-1 shrink-0 rounded-full"
             style={{ width: 7, height: 7, background: STATUS_COLORS[entry.status] ?? "#71717a" }}
@@ -367,6 +361,14 @@ export default function JournalClient({ initialEntries }: Props) {
                   {optSummary}
                 </span>
               )}
+              {moneyness && (
+                <span
+                  className="font-mono rounded px-1.5 py-0.5"
+                  style={{ fontSize: 10, fontWeight: 600, background: "#16171c", color: moneyness.color }}
+                >
+                  {moneyness.label} {Math.abs(moneyness.pct).toFixed(1)}%
+                </span>
+              )}
               {entry.tags.map(tag => (
                 <span key={tag} className="rounded px-1.5 py-0.5 text-text-muted border border-border" style={{ fontSize: 10 }}>
                   {tag}
@@ -382,7 +384,7 @@ export default function JournalClient({ initialEntries }: Props) {
           </div>
         </div>
 
-        {expanded && (
+        {expanded && !editing && (
           <div className="border-t border-border px-4 pb-4 pt-3 bg-bg-card-2">
             <p className="text-text-secondary mb-3" style={{ fontSize: 13, lineHeight: 1.7 }}>
               {entry.thesis}
@@ -395,6 +397,11 @@ export default function JournalClient({ initialEntries }: Props) {
                 {entry.exit_price && <span className="text-text-muted">Exit: <span className="text-text">${entry.exit_price}</span></span>}
                 {entry.strike && <span className="text-text-muted">Strike: <span className="text-text">${entry.strike}</span></span>}
                 {entry.expiry && <span className="text-text-muted">Exp: <span className="text-text">{formatExpiry(entry.expiry)}</span></span>}
+                {moneyness && entry.symbol && latestPrices[entry.symbol] && (
+                  <span className="text-text-muted">
+                    Underlying: <span className="text-text font-mono">${latestPrices[entry.symbol].toFixed(2)}</span>
+                  </span>
+                )}
               </div>
             )}
 
@@ -411,7 +418,14 @@ export default function JournalClient({ initialEntries }: Props) {
                 className="rounded border border-border text-text-secondary hover:border-accent hover:text-accent transition-colors"
                 style={{ fontSize: 11, padding: "4px 12px", background: "#16171c", cursor: "pointer" }}
               >
-                Ask Claude about this →
+                Ask Claude →
+              </button>
+              <button
+                onClick={onStartEdit}
+                className="rounded border border-border text-text-secondary hover:border-border-strong hover:text-text transition-colors"
+                style={{ fontSize: 11, padding: "4px 12px", background: "#16171c", cursor: "pointer" }}
+              >
+                Edit
               </button>
               {entry.status === "open" && (
                 <button
@@ -432,7 +446,147 @@ export default function JournalClient({ initialEntries }: Props) {
             </div>
           </div>
         )}
+
+        {expanded && editing && (
+          <div className="border-t border-border px-4 pb-4 pt-3 bg-bg-card-2">
+            <div className="text-text-muted mb-3" style={{ fontSize: 11 }}>Edit entry</div>
+            <EntryForm form={editForm} setForm={setEditForm} isOption={isEditOption} />
+            <div className="flex gap-2">
+              <button
+                onClick={onSaveEdit}
+                disabled={isPending || !editForm.thesis.trim()}
+                className="rounded-lg transition-colors"
+                style={{
+                  background: editForm.thesis.trim() ? "#a78bfa" : "#1a1b21",
+                  color: editForm.thesis.trim() ? "#0a0b0e" : "#4b5563",
+                  padding: "7px 18px", fontSize: 12, fontWeight: 600,
+                  border: "none", cursor: editForm.thesis.trim() ? "pointer" : "not-allowed",
+                }}
+              >
+                Save changes
+              </button>
+              <button
+                onClick={onCancelEdit}
+                className="rounded border border-border text-text-muted"
+                style={{ padding: "7px 14px", fontSize: 12, background: "transparent", cursor: "pointer" }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
       </div>
+    )
+  }
+
+  function EntryForm({
+    form,
+    setForm,
+    isOption,
+  }: {
+    form: typeof EMPTY_FORM
+    setForm: React.Dispatch<React.SetStateAction<typeof EMPTY_FORM>>
+    isOption: boolean
+  }) {
+    return (
+      <>
+        <div className="grid grid-cols-2 gap-3 mb-3">
+          <div>
+            <label className="text-text-muted block mb-1" style={{ fontSize: 11 }}>Symbol</label>
+            <input
+              value={form.symbol}
+              onChange={e => setForm(f => ({ ...f, symbol: e.target.value }))}
+              placeholder="NVDA"
+              className="w-full rounded border border-border bg-bg text-text font-mono outline-none focus:border-border-strong"
+              style={{ fontSize: 13, padding: "7px 10px" }}
+            />
+          </div>
+          <div>
+            <label className="text-text-muted block mb-1" style={{ fontSize: 11 }}>Direction</label>
+            <select
+              value={form.direction}
+              onChange={e => setForm(f => ({ ...f, direction: e.target.value }))}
+              className="w-full rounded border border-border bg-bg text-text outline-none focus:border-border-strong"
+              style={{ fontSize: 13, padding: "7px 10px" }}
+            >
+              <option value="long">Long</option>
+              <option value="short">Short</option>
+              <option value="call">Call option</option>
+              <option value="put">Put option</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-text-muted block mb-1" style={{ fontSize: 11 }}>Status</label>
+            <select
+              value={form.status}
+              onChange={e => setForm(f => ({ ...f, status: e.target.value }))}
+              className="w-full rounded border border-border bg-bg text-text outline-none focus:border-border-strong"
+              style={{ fontSize: 13, padding: "7px 10px" }}
+            >
+              <option value="watching">Watching</option>
+              <option value="open">Open (in trade)</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-text-muted block mb-1" style={{ fontSize: 11 }}>Entry price</label>
+            <input
+              value={form.entry_price}
+              onChange={e => setForm(f => ({ ...f, entry_price: e.target.value }))}
+              placeholder="225.00"
+              type="number"
+              className="w-full rounded border border-border bg-bg text-text font-mono outline-none focus:border-border-strong"
+              style={{ fontSize: 13, padding: "7px 10px" }}
+            />
+          </div>
+          {isOption && (
+            <>
+              <div>
+                <label className="text-text-muted block mb-1" style={{ fontSize: 11 }}>Strike</label>
+                <input
+                  value={form.strike}
+                  onChange={e => setForm(f => ({ ...f, strike: e.target.value }))}
+                  placeholder="230"
+                  type="number"
+                  className="w-full rounded border border-border bg-bg text-text font-mono outline-none focus:border-border-strong"
+                  style={{ fontSize: 13, padding: "7px 10px" }}
+                />
+              </div>
+              <div>
+                <label className="text-text-muted block mb-1" style={{ fontSize: 11 }}>Expiry</label>
+                <input
+                  value={form.expiry}
+                  onChange={e => setForm(f => ({ ...f, expiry: e.target.value }))}
+                  type="date"
+                  className="w-full rounded border border-border bg-bg text-text font-mono outline-none focus:border-border-strong"
+                  style={{ fontSize: 13, padding: "7px 10px" }}
+                />
+              </div>
+            </>
+          )}
+        </div>
+
+        <div className="mb-3">
+          <label className="text-text-muted block mb-1" style={{ fontSize: 11 }}>Thesis <span className="text-down">*</span></label>
+          <textarea
+            value={form.thesis}
+            onChange={e => setForm(f => ({ ...f, thesis: e.target.value }))}
+            placeholder="Why are you considering this trade? What's the setup, catalyst, and risk?"
+            className="w-full rounded border border-border bg-bg text-text resize-none outline-none focus:border-border-strong"
+            style={{ fontSize: 13, padding: "8px 10px", minHeight: 96, lineHeight: 1.6 }}
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="text-text-muted block mb-1" style={{ fontSize: 11 }}>Tags (comma-separated)</label>
+          <input
+            value={form.tags}
+            onChange={e => setForm(f => ({ ...f, tags: e.target.value }))}
+            placeholder="pullback, earnings, macro"
+            className="w-full rounded border border-border bg-bg text-text outline-none focus:border-border-strong"
+            style={{ fontSize: 13, padding: "7px 10px" }}
+          />
+        </div>
+      </>
     )
   }
 }

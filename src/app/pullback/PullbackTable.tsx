@@ -131,13 +131,22 @@ export default function PullbackTable({ metrics }: Props) {
                   {fmt(m.vol30d, 0)}{m.vol30d != null ? "%" : ""}
                 </td>
                 <td className="px-3 py-3">
-                  <button
-                    onClick={() => router.push(`/ask?q=${encodeURIComponent(prompt)}`)}
-                    className="rounded border border-border text-text-muted hover:border-accent hover:text-accent transition-colors"
-                    style={{ fontSize: 11, padding: "3px 10px", background: "#16171c", whiteSpace: "nowrap" }}
-                  >
-                    Ask Claude →
-                  </button>
+                  <div className="flex gap-1.5 justify-end">
+                    <button
+                      onClick={() => router.push(`/journal?symbol=${m.symbol}&status=watching&direction=long`)}
+                      className="rounded border border-border text-text-muted hover:border-accent hover:text-accent transition-colors"
+                      style={{ fontSize: 11, padding: "3px 10px", background: "#16171c", whiteSpace: "nowrap" }}
+                    >
+                      Watch
+                    </button>
+                    <button
+                      onClick={() => router.push(`/ask?q=${encodeURIComponent(prompt)}`)}
+                      className="rounded border border-border text-text-muted hover:border-accent hover:text-accent transition-colors"
+                      style={{ fontSize: 11, padding: "3px 10px", background: "#16171c", whiteSpace: "nowrap" }}
+                    >
+                      Ask Claude →
+                    </button>
+                  </div>
                 </td>
               </tr>
             )

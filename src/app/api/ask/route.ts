@@ -162,18 +162,19 @@ export async function POST(req: Request) {
     .from("messages")
     .insert({ conversation_id: convId, role: "user", content: user_message })
 
-  // Load conversation history (includes the message just saved)
-  const { data: history } = await supabase
+  // Load most recent 30 messages (newest-first, then reverse to get chronological order)
+  const { data: historyDesc } = await supabase
     .from("messages")
     .select("role, content")
     .eq("conversation_id", convId)
-    .order("created_at")
+    .order("created_at", { ascending: false })
     .limit(30)
+  const history = (historyDesc ?? []).reverse()
 
   // Build context
   const systemPrompt = await buildSystemPrompt(supabase)
 
-  const anthropicMessages = (history ?? []).map((m) => ({
+  const anthropicMessages = history.map((m) => ({
     role: m.role as "user" | "assistant",
     content: m.content,
   }))
