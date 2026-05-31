@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import type { JournalEntry } from "@/lib/queries/journal"
 import { addEntry, updateEntry, removeEntry } from "./actions"
 
@@ -64,6 +65,7 @@ interface Prefill {
   symbol: string
   status: string
   direction: string
+  thesis?: string
 }
 
 interface Props {
@@ -101,7 +103,7 @@ function entryToForm(e: JournalEntry) {
 export default function JournalClient({ initialEntries, latestPrices = {}, prefill }: Props) {
   const [entries, setEntries] = useState(initialEntries)
   const [showForm, setShowForm] = useState(!!prefill)
-  const [form, setForm] = useState(prefill ? { ...EMPTY_FORM, symbol: prefill.symbol, status: prefill.status, direction: prefill.direction } : EMPTY_FORM)
+  const [form, setForm] = useState(prefill ? { ...EMPTY_FORM, symbol: prefill.symbol, status: prefill.status, direction: prefill.direction, thesis: prefill.thesis ?? "" } : EMPTY_FORM)
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState(EMPTY_FORM)
@@ -117,6 +119,7 @@ export default function JournalClient({ initialEntries, latestPrices = {}, prefi
       url.searchParams.delete("symbol")
       url.searchParams.delete("status")
       url.searchParams.delete("direction")
+      url.searchParams.delete("thesis")
       window.history.replaceState({}, "", url.toString())
     }
   }, [])
@@ -344,9 +347,14 @@ export default function JournalClient({ initialEntries, latestPrices = {}, prefi
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               {entry.symbol && (
-                <span className="font-mono font-semibold" style={{ fontSize: 13, color: "#a78bfa" }}>
+                <Link
+                  href={`/ticker/${entry.symbol}`}
+                  onClick={e => e.stopPropagation()}
+                  className="font-mono font-semibold hover:underline"
+                  style={{ fontSize: 13, color: "#a78bfa" }}
+                >
                   {entry.symbol}
-                </span>
+                </Link>
               )}
               {entry.direction && (
                 <span
@@ -393,7 +401,7 @@ export default function JournalClient({ initialEntries, latestPrices = {}, prefi
             {(entry.entry_price || entry.shares || entry.exit_price || entry.strike || entry.expiry) && (
               <div className="flex gap-6 mb-3 font-mono flex-wrap" style={{ fontSize: 12 }}>
                 {entry.entry_price && <span className="text-text-muted">Entry: <span className="text-text">${entry.entry_price}</span></span>}
-                {entry.shares && <span className="text-text-muted">Shares: <span className="text-text">{entry.shares}</span></span>}
+                {entry.shares && <span className="text-text-muted">{entry.direction === "call" || entry.direction === "put" ? "Contracts" : "Shares"}: <span className="text-text">{entry.shares}</span></span>}
                 {entry.exit_price && <span className="text-text-muted">Exit: <span className="text-text">${entry.exit_price}</span></span>}
                 {entry.strike && <span className="text-text-muted">Strike: <span className="text-text">${entry.strike}</span></span>}
                 {entry.expiry && <span className="text-text-muted">Exp: <span className="text-text">{formatExpiry(entry.expiry)}</span></span>}
@@ -533,6 +541,17 @@ export default function JournalClient({ initialEntries, latestPrices = {}, prefi
               value={form.entry_price}
               onChange={e => setForm(f => ({ ...f, entry_price: e.target.value }))}
               placeholder="225.00"
+              type="number"
+              className="w-full rounded border border-border bg-bg text-text font-mono outline-none focus:border-border-strong"
+              style={{ fontSize: 13, padding: "7px 10px" }}
+            />
+          </div>
+          <div>
+            <label className="text-text-muted block mb-1" style={{ fontSize: 11 }}>{isOption ? "Contracts" : "Shares"}</label>
+            <input
+              value={form.shares}
+              onChange={e => setForm(f => ({ ...f, shares: e.target.value }))}
+              placeholder={isOption ? "1" : "10"}
               type="number"
               className="w-full rounded border border-border bg-bg text-text font-mono outline-none focus:border-border-strong"
               style={{ fontSize: 13, padding: "7px 10px" }}

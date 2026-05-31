@@ -47,9 +47,18 @@ export async function POST() {
   // Open journal entries
   const openEntries = journalEntries.filter(e => e.status !== "closed")
   const journalSection = openEntries.length
-    ? `OPEN JOURNAL ENTRIES:\n` + openEntries.map(e =>
-        `  [${e.status}] ${e.symbol ?? "general"} ${e.direction ? `(${e.direction})` : ""}: ${e.thesis.slice(0, 150)}`
-      ).join("\n")
+    ? `OPEN JOURNAL ENTRIES:\n` + openEntries.map(e => {
+        const dir = e.direction ? `(${e.direction})` : ""
+        const optParts = (e.direction === "call" || e.direction === "put")
+          ? [
+              e.strike ? `$${e.strike} strike` : "",
+              e.expiry ? `exp ${new Date(e.expiry + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}` : "",
+              e.shares ? `${e.shares} contracts` : "",
+            ].filter(Boolean).join(", ")
+          : (e.shares ? `${e.shares} shares` : "")
+        const optStr = optParts ? ` [${optParts}]` : ""
+        return `  [${e.status}] ${e.symbol ?? "general"} ${dir}${optStr}: ${e.thesis.slice(0, 150)}`
+      }).join("\n")
     : "OPEN JOURNAL ENTRIES: none"
 
   const prompt = `You are writing a weekly supply chain equity review for a personal trading dashboard. Today: ${today}.

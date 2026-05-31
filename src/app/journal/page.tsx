@@ -7,7 +7,7 @@ export const metadata = { title: "Trade Journal" }
 export default async function JournalPage({
   searchParams,
 }: {
-  searchParams: { symbol?: string; status?: string; direction?: string }
+  searchParams: { symbol?: string; status?: string; direction?: string; thesis?: string }
 }) {
   const client = createClient()
   const entries = await getJournalEntries(client)
@@ -38,6 +38,7 @@ export default async function JournalPage({
         symbol: searchParams.symbol,
         status: searchParams.status ?? "watching",
         direction: searchParams.direction ?? "long",
+        thesis: searchParams.thesis ?? "",
       }
     : undefined
 

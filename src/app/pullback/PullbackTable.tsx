@@ -133,7 +133,16 @@ export default function PullbackTable({ metrics }: Props) {
                 <td className="px-3 py-3">
                   <div className="flex gap-1.5 justify-end">
                     <button
-                      onClick={() => router.push(`/journal?symbol=${m.symbol}&status=watching&direction=long`)}
+                      onClick={() => {
+                        const parts: string[] = []
+                        if (m.pctFrom52wHigh != null) parts.push(`down ${Math.abs(m.pctFrom52wHigh).toFixed(1)}% from 52w high`)
+                        if (m.pctFromMa50 != null) parts.push(`${m.pctFromMa50 >= 0 ? "+" : ""}${m.pctFromMa50.toFixed(1)}% vs 50d MA`)
+                        if (m.rsi14 != null) parts.push(`RSI ${m.rsi14.toFixed(0)}`)
+                        if (m.currentPrice != null) parts.push(`current $${m.currentPrice.toFixed(2)}`)
+                        const thesis = `Pullback setup on ${m.symbol}${parts.length ? " — " + parts.join(", ") : ""}. `
+                        const params = new URLSearchParams({ symbol: m.symbol, status: "watching", direction: "long", thesis })
+                        router.push(`/journal?${params.toString()}`)
+                      }}
                       className="rounded border border-border text-text-muted hover:border-accent hover:text-accent transition-colors"
                       style={{ fontSize: 11, padding: "3px 10px", background: "#16171c", whiteSpace: "nowrap" }}
                     >
