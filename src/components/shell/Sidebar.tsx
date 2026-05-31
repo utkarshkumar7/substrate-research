@@ -55,7 +55,7 @@ const NAV: NavGroup[] = [
   {
     label: "Intelligence",
     items: [
-      { label: "Daily report", href: "/insights", icon: Sun },
+      { label: "Daily brief", href: "/daily", icon: Sun },
       { label: "Weekly review", href: "/weekly", icon: CalendarDays },
       { label: "Ask Claude", href: "/ask", icon: MessageSquare },
     ],
