@@ -1,4 +1,11 @@
+import Link from "next/link"
 import type { InsightRow } from "@/lib/queries/insights"
+
+function hrefForKind(kind: string): string {
+  if (kind === "daily") return "/daily"
+  if (kind === "anomaly" || kind === "signal" || kind === "flow") return "/anomalies"
+  return "/insights"
+}
 
 const KIND_META: Record<string, { label: string; color: string; bg: string }> = {
   anomaly: { label: "ANOMALY", color: "#f87171", bg: "rgba(248,113,113,0.12)" },
@@ -30,7 +37,11 @@ export default function InsightCard({ insight }: { insight: InsightRow }) {
   const meta = KIND_META[insight.kind] ?? KIND_META.context
 
   return (
-    <div className="border border-border rounded-lg" style={{ padding: "10px 12px", marginBottom: 8 }}>
+    <Link
+      href={hrefForKind(insight.kind)}
+      className="block border border-border rounded-lg hover:border-border-strong hover:bg-bg-hover transition-colors"
+      style={{ padding: "10px 12px", marginBottom: 8 }}
+    >
       {/* Tag pill */}
       <div className="flex items-center gap-2 mb-1.5">
         <span
@@ -85,6 +96,6 @@ export default function InsightCard({ insight }: { insight: InsightRow }) {
           </>
         )}
       </div>
-    </div>
+    </Link>
   )
 }

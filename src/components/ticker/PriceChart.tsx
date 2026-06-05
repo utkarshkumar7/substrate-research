@@ -21,12 +21,19 @@ interface Props {
   symbolCloses: ClosePoint[]  // ASC sorted
   benchSymbol: string
   benchCloses: ClosePoint[]   // ASC sorted
+  yahooSymbol?: string        // override for Yahoo Finance URL (e.g. ^TNX)
 }
 
-const DAYS_1Y = 252
+const YTD_START = `${new Date().getFullYear()}-01-01`
 
-function trimToN(closes: ClosePoint[], n: number): ClosePoint[] {
-  return closes.slice(-n)
+function trimToYTD(closes: ClosePoint[]): ClosePoint[] {
+  const filtered = closes.filter(c => c.date >= YTD_START)
+  // Always include one point before YTD start as the base for indexing
+  if (filtered.length && filtered[0].date > YTD_START) {
+    const prev = closes.filter(c => c.date < YTD_START).pop()
+    if (prev) return [prev, ...filtered]
+  }
+  return filtered
 }
 
 function normalize(closes: ClosePoint[]): Array<{ date: string; value: number }> {
@@ -64,26 +71,39 @@ function CustomTooltip({ active, payload, label }: any) {
   )
 }
 
-export default function PriceChart({ symbol, symbolCloses, benchSymbol, benchCloses }: Props) {
+export default function PriceChart({ symbol, symbolCloses, benchSymbol, benchCloses, yahooSymbol }: Props) {
   const chartData = useMemo(() => {
-    const sTrimmed = trimToN(symbolCloses, DAYS_1Y)
-    const bTrimmed = trimToN(benchCloses, DAYS_1Y)
+    const sTrimmed = trimToYTD(symbolCloses)
+    const bTrimmed = trimToYTD(benchCloses)
 
     const sNorm = normalize(sTrimmed)
     const bNorm = normalize(bTrimmed)
 
-    const bMap = new Map(bNorm.map((p) => [p.date, p.value]))
-    return sNorm.map((p) => ({
+    // Drop the pre-YTD anchor point from chart display (keep only YTD_START and after)
+    const sDisplay = sNorm.filter(p => p.date >= YTD_START)
+    const bMap = new Map(bNorm.filter(p => p.date >= YTD_START).map((p) => [p.date, p.value]))
+    return sDisplay.map((p) => ({
       date: p.date,
       [symbol]: parseFloat(p.value.toFixed(2)),
       [benchSymbol]: parseFloat((bMap.get(p.date) ?? p.value).toFixed(2)),
     }))
   }, [symbol, symbolCloses, benchSymbol, benchCloses])
 
+  const yahooUrl = `https://finance.yahoo.com/quote/${encodeURIComponent(yahooSymbol ?? symbol)}`
+
   return (
     <div>
-      <div className="flex justify-end mb-2">
-        <span className="text-text-muted font-mono" style={{ fontSize: 10 }}>1Y · indexed to 100</span>
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-text-muted font-mono" style={{ fontSize: 10 }}>YTD · indexed to 100</span>
+        <a
+          href={yahooUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-text-muted hover:text-accent transition-colors font-mono"
+          style={{ fontSize: 10 }}
+        >
+          Yahoo Finance ↗
+        </a>
       </div>
 
       <ResponsiveContainer width="100%" height={220}>
