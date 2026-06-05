@@ -9,6 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
+  ReferenceLine,
 } from "recharts"
 
 export interface ClosePoint {
@@ -18,17 +19,14 @@ export interface ClosePoint {
 
 interface Props {
   symbol: string
-  symbolCloses: ClosePoint[]  // ASC sorted
-  benchSymbol: string
-  benchCloses: ClosePoint[]   // ASC sorted
-  yahooSymbol?: string        // override for Yahoo Finance URL (e.g. ^TNX)
+  symbolCloses: ClosePoint[]
+  yahooSymbol?: string
 }
 
 const YTD_START = `${new Date().getFullYear()}-01-01`
 
 function trimToYTD(closes: ClosePoint[]): ClosePoint[] {
   const filtered = closes.filter(c => c.date >= YTD_START)
-  // Always include one point before YTD start as the base for indexing
   if (filtered.length && filtered[0].date > YTD_START) {
     const prev = closes.filter(c => c.date < YTD_START).pop()
     if (prev) return [prev, ...filtered]
@@ -36,65 +34,61 @@ function trimToYTD(closes: ClosePoint[]): ClosePoint[] {
   return filtered
 }
 
-// Returns % return from base (0 = flat, +18.7 = +18.7%)
-function toReturnPct(closes: ClosePoint[]): Array<{ date: string; value: number }> {
-  if (!closes.length) return []
-  const base = closes[0].close
-  return closes.map((c) => ({ date: c.date, value: parseFloat(((c.close / base - 1) * 100).toFixed(2)) }))
-}
-
 function formatDate(iso: string): string {
-  const d = new Date(iso)
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" })
 }
 
-function formatYear(iso: string): string {
-  const d = new Date(iso)
-  return d.toLocaleDateString("en-US", { month: "short", year: "2-digit" })
+function formatMonth(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-US", { month: "short" })
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
+  const val: number = payload[0]?.value ?? 0
   return (
     <div
       className="border border-border rounded"
       style={{ background: "#111217", padding: "8px 12px", fontSize: 11 }}
     >
       <div className="text-text-muted mb-1">{formatDate(label)}</div>
-      {payload.map((p: { name: string; value: number; color: string }) => (
-        <div key={p.name} className="flex items-center gap-2 font-mono">
-          <span style={{ color: p.color }}>{p.name}</span>
-          <span className="text-text">{p.value >= 0 ? "+" : ""}{p.value.toFixed(1)}%</span>
-        </div>
-      ))}
+      <div className="font-mono" style={{ color: val >= 0 ? "#4ade80" : "#f87171" }}>
+        {val >= 0 ? "+" : ""}{val.toFixed(2)}%
+      </div>
     </div>
   )
 }
 
-export default function PriceChart({ symbol, symbolCloses, benchSymbol, benchCloses, yahooSymbol }: Props) {
+export default function PriceChart({ symbol, symbolCloses, yahooSymbol }: Props) {
   const chartData = useMemo(() => {
-    const sTrimmed = trimToYTD(symbolCloses)
-    const bTrimmed = trimToYTD(benchCloses)
-
-    const sNorm = toReturnPct(sTrimmed)
-    const bNorm = toReturnPct(bTrimmed)
-
-    const sDisplay = sNorm.filter(p => p.date >= YTD_START)
-    const bMap = new Map(bNorm.filter(p => p.date >= YTD_START).map((p) => [p.date, p.value]))
-    return sDisplay.map((p) => ({
-      date: p.date,
-      [symbol]: p.value,
-      [benchSymbol]: bMap.get(p.date) ?? 0,
-    }))
-  }, [symbol, symbolCloses, benchSymbol, benchCloses])
+    const trimmed = trimToYTD(symbolCloses)
+    if (!trimmed.length) return []
+    const base = trimmed[0].close
+    return trimmed
+      .filter(c => c.date >= YTD_START)
+      .map(c => ({
+        date: c.date,
+        pct: parseFloat(((c.close / base - 1) * 100).toFixed(2)),
+      }))
+  }, [symbolCloses])
 
   const yahooUrl = `https://finance.yahoo.com/quote/${encodeURIComponent(yahooSymbol ?? symbol)}`
+
+  // Color the line based on whether YTD is positive or negative
+  const lastVal = chartData[chartData.length - 1]?.pct ?? 0
+  const lineColor = lastVal >= 0 ? "#4ade80" : "#f87171"
 
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <span className="text-text-muted font-mono" style={{ fontSize: 10 }}>YTD return %</span>
+        <span className="text-text-muted font-mono" style={{ fontSize: 10 }}>
+          YTD return %
+          {lastVal !== 0 && (
+            <span style={{ marginLeft: 8, color: lastVal >= 0 ? "#4ade80" : "#f87171" }}>
+              {lastVal >= 0 ? "+" : ""}{lastVal.toFixed(1)}%
+            </span>
+          )}
+        </span>
         <a
           href={yahooUrl}
           target="_blank"
@@ -106,57 +100,38 @@ export default function PriceChart({ symbol, symbolCloses, benchSymbol, benchClo
         </a>
       </div>
 
-      <ResponsiveContainer width="100%" height={220}>
-        <LineChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: -20 }}>
+      <ResponsiveContainer width="100%" height={200}>
+        <LineChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#1f2127" vertical={false} />
+          <ReferenceLine y={0} stroke="#2a2c33" strokeWidth={1} />
           <XAxis
             dataKey="date"
             tick={{ fill: "#6b7280", fontSize: 10, fontFamily: "Menlo, ui-monospace, monospace" }}
             tickLine={false}
             axisLine={false}
             interval="preserveStartEnd"
-            tickFormatter={formatYear}
-            minTickGap={50}
+            tickFormatter={formatMonth}
+            minTickGap={40}
           />
           <YAxis
             tick={{ fill: "#6b7280", fontSize: 10, fontFamily: "Menlo, ui-monospace, monospace" }}
             tickLine={false}
             axisLine={false}
             tickFormatter={(v: number) => `${v > 0 ? "+" : ""}${v.toFixed(0)}%`}
-            width={48}
+            width={44}
           />
           <Tooltip content={<CustomTooltip />} />
           <Line
             type="monotone"
-            dataKey={symbol}
-            stroke="#a78bfa"
+            dataKey="pct"
+            name={symbol}
+            stroke={lineColor}
             strokeWidth={1.5}
             dot={false}
-            activeDot={{ r: 3, fill: "#a78bfa" }}
-          />
-          <Line
-            type="monotone"
-            dataKey={benchSymbol}
-            stroke="#4b5563"
-            strokeWidth={1}
-            dot={false}
-            strokeDasharray="4 3"
-            activeDot={{ r: 3, fill: "#9ca3af" }}
+            activeDot={{ r: 3, fill: lineColor }}
           />
         </LineChart>
       </ResponsiveContainer>
-
-      {/* Legend */}
-      <div className="flex gap-4 mt-2" style={{ fontSize: 10 }}>
-        <span className="flex items-center gap-1.5">
-          <span style={{ display: "inline-block", width: 16, height: 2, background: "#a78bfa", borderRadius: 1 }} />
-          <span className="font-mono text-text-secondary">{symbol}</span>
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span style={{ display: "inline-block", width: 16, height: 2, background: "#4b5563", borderRadius: 1 }} />
-          <span className="font-mono text-text-muted">{benchSymbol}</span>
-        </span>
-      </div>
     </div>
   )
 }

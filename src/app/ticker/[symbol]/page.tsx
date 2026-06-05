@@ -12,21 +12,6 @@ import ClaudeTake from "@/components/ticker/ClaudeTake"
 
 // ─── Benchmark per layer ──────────────────────────────────────────────────────
 
-const LAYER_BENCH: Record<string, string> = {
-  raw_materials:     "REMX",
-  energy:            "ICLN",
-  storage_batteries: "LIT",
-  foundries_memory:  "SOXX",
-  chip_design:       "SOXX",
-  quantum:           "SPY",
-  datacenter_infra:  "SPY",
-  applications:      "SPY",
-}
-
-function benchFor(layerId: string): string {
-  return LAYER_BENCH[layerId] ?? "SPY"
-}
-
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
 function Skeleton({ rows = 3 }: { rows?: number }) {
@@ -68,21 +53,15 @@ export default async function TickerPage({
   if (!ticker) notFound()
 
   const layer = getLayer(ticker.layer)
-  const benchSymbol = benchFor(ticker.layer)
-
   const client = createClient()
   const twoYearsAgo = new Date()
   twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2)
   const since = twoYearsAgo.toISOString().slice(0, 10)
 
-  const allSymbols = [upper, "SPY"]
-  if (benchSymbol !== "SPY") allSymbols.push(benchSymbol)
-
-  const history = await getPriceHistory(client, allSymbols, since)
+  const history = await getPriceHistory(client, [upper, "SPY"], since)
 
   const symbolCloses = history[upper] ?? []
   const spyCloses = history["SPY"] ?? []
-  const benchCloses = history[benchSymbol] ?? spyCloses
 
   // Snapshot (DESC sorted)
   const descCloses = [...symbolCloses].reverse()
@@ -170,8 +149,6 @@ export default async function TickerPage({
             <PriceChart
               symbol={upper}
               symbolCloses={symbolCloses}
-              benchSymbol={benchSymbol}
-              benchCloses={benchCloses}
             />
           ) : (
             <p className="text-text-muted" style={{ fontSize: 12 }}>
