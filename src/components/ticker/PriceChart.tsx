@@ -36,10 +36,11 @@ function trimToYTD(closes: ClosePoint[]): ClosePoint[] {
   return filtered
 }
 
-function normalize(closes: ClosePoint[]): Array<{ date: string; value: number }> {
+// Returns % return from base (0 = flat, +18.7 = +18.7%)
+function toReturnPct(closes: ClosePoint[]): Array<{ date: string; value: number }> {
   if (!closes.length) return []
   const base = closes[0].close
-  return closes.map((c) => ({ date: c.date, value: (c.close / base) * 100 }))
+  return closes.map((c) => ({ date: c.date, value: parseFloat(((c.close / base - 1) * 100).toFixed(2)) }))
 }
 
 function formatDate(iso: string): string {
@@ -64,7 +65,7 @@ function CustomTooltip({ active, payload, label }: any) {
       {payload.map((p: { name: string; value: number; color: string }) => (
         <div key={p.name} className="flex items-center gap-2 font-mono">
           <span style={{ color: p.color }}>{p.name}</span>
-          <span className="text-text">{p.value.toFixed(1)}</span>
+          <span className="text-text">{p.value >= 0 ? "+" : ""}{p.value.toFixed(1)}%</span>
         </div>
       ))}
     </div>
@@ -76,16 +77,15 @@ export default function PriceChart({ symbol, symbolCloses, benchSymbol, benchClo
     const sTrimmed = trimToYTD(symbolCloses)
     const bTrimmed = trimToYTD(benchCloses)
 
-    const sNorm = normalize(sTrimmed)
-    const bNorm = normalize(bTrimmed)
+    const sNorm = toReturnPct(sTrimmed)
+    const bNorm = toReturnPct(bTrimmed)
 
-    // Drop the pre-YTD anchor point from chart display (keep only YTD_START and after)
     const sDisplay = sNorm.filter(p => p.date >= YTD_START)
     const bMap = new Map(bNorm.filter(p => p.date >= YTD_START).map((p) => [p.date, p.value]))
     return sDisplay.map((p) => ({
       date: p.date,
-      [symbol]: parseFloat(p.value.toFixed(2)),
-      [benchSymbol]: parseFloat((bMap.get(p.date) ?? p.value).toFixed(2)),
+      [symbol]: p.value,
+      [benchSymbol]: bMap.get(p.date) ?? 0,
     }))
   }, [symbol, symbolCloses, benchSymbol, benchCloses])
 
@@ -94,7 +94,7 @@ export default function PriceChart({ symbol, symbolCloses, benchSymbol, benchClo
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <span className="text-text-muted font-mono" style={{ fontSize: 10 }}>YTD · indexed to 100</span>
+        <span className="text-text-muted font-mono" style={{ fontSize: 10 }}>YTD return %</span>
         <a
           href={yahooUrl}
           target="_blank"
@@ -122,8 +122,8 @@ export default function PriceChart({ symbol, symbolCloses, benchSymbol, benchClo
             tick={{ fill: "#6b7280", fontSize: 10, fontFamily: "Menlo, ui-monospace, monospace" }}
             tickLine={false}
             axisLine={false}
-            tickFormatter={(v: number) => v.toFixed(0)}
-            width={40}
+            tickFormatter={(v: number) => `${v > 0 ? "+" : ""}${v.toFixed(0)}%`}
+            width={48}
           />
           <Tooltip content={<CustomTooltip />} />
           <Line
