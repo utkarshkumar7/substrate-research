@@ -11,6 +11,7 @@ import {
   Briefcase,
   BookOpen,
   Sun,
+  Zap,
   MessageSquare,
   Share2,
   KeyRound,
@@ -53,6 +54,7 @@ const NAV: NavGroup[] = [
     label: "Intelligence",
     items: [
       { label: "Daily brief", href: "/daily", icon: Sun },
+      { label: "Signal feed", href: "/insights", icon: Zap },
       { label: "Ask Claude", href: "/ask", icon: MessageSquare },
     ],
   },

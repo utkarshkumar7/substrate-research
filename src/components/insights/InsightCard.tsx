@@ -2,7 +2,7 @@ import Link from "next/link"
 import type { InsightRow } from "@/lib/queries/insights"
 
 function hrefForKind(kind: string): string {
-  if (kind === "daily") return "/daily"
+  if (kind === "daily" || kind === "weekly") return "/daily"
   if (kind === "anomaly" || kind === "signal" || kind === "flow") return "/anomalies"
   return "/insights"
 }
