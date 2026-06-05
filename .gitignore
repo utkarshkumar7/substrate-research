@@ -41,6 +41,10 @@ yarn-error.log*
 next-env.d.ts
 
 # Claude Code local config
-.claude/settings.local.json
+.claude/
 .agents/
 skills-lock.json
+
+# Internal spec and personal files
+PHASE_10_SPEC.md
+*.pdf
