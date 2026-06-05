@@ -9,10 +9,8 @@ import {
   Activity,
   AlertTriangle,
   Briefcase,
-  Eye,
   BookOpen,
   Sun,
-  CalendarDays,
   MessageSquare,
   Share2,
   KeyRound,
@@ -48,7 +46,6 @@ const NAV: NavGroup[] = [
     label: "My stack",
     items: [
       { label: "Portfolio", href: "/portfolio", icon: Briefcase },
-      { label: "Watchlist", href: "/watchlist", icon: Eye },
       { label: "Trade journal", href: "/journal", icon: BookOpen },
     ],
   },
@@ -56,7 +53,6 @@ const NAV: NavGroup[] = [
     label: "Intelligence",
     items: [
       { label: "Daily brief", href: "/daily", icon: Sun },
-      { label: "Weekly review", href: "/weekly", icon: CalendarDays },
       { label: "Ask Claude", href: "/ask", icon: MessageSquare },
     ],
   },
