@@ -1,21 +1,50 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search, RefreshCw } from "lucide-react";
 
+type RefreshState = "idle" | "pulling" | "done" | "error"
+
 export default function TopBar() {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [spinning, setSpinning] = useState(false);
+  const [state, setState] = useState<RefreshState>("idle");
+  const [statusMsg, setStatusMsg] = useState("");
 
-  const handleRefresh = () => {
-    setSpinning(true);
-    startTransition(() => {
-      router.refresh();
-      setTimeout(() => setSpinning(false), 800);
-    });
+  const handleRefresh = async () => {
+    if (state === "pulling") return;
+    setState("pulling");
+    setStatusMsg("Pulling prices…");
+
+    try {
+      const res = await fetch("/api/refresh", { method: "POST" });
+      const data = await res.json();
+
+      if (data.success) {
+        const dur = data.duration_s ? `${Math.round(data.duration_s)}s` : "";
+        const failed = data.n_failed > 0 ? ` · ${data.n_failed} failed` : "";
+        setStatusMsg(`${data.n_succeeded ?? "?"} tickers ${dur}${failed}`);
+        setState("done");
+        router.refresh();
+      } else {
+        setStatusMsg("Refresh failed");
+        setState("error");
+      }
+    } catch {
+      setStatusMsg("Refresh failed");
+      setState("error");
+    }
+
+    // Reset after 4s
+    setTimeout(() => {
+      setState("idle");
+      setStatusMsg("");
+    }, 4000);
   };
+
+  const spinning = state === "pulling";
+  const btnBg = state === "done" ? "#16171c" : state === "error" ? "#16171c" : "#16171c";
+  const btnColor = state === "done" ? "#4ade80" : state === "error" ? "#f87171" : "#e8e9ec";
 
   return (
     <header
@@ -64,19 +93,28 @@ export default function TopBar() {
           <span className="inline-block rounded-full bg-up" style={{ width: 6, height: 6 }} />
           EOD data · {new Date().toISOString().slice(0, 10)}
         </div>
+
         <button
           onClick={handleRefresh}
-          disabled={isPending}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-bg border border-border rounded text-text hover:bg-bg-hover transition-colors"
-          style={{ fontSize: 12, cursor: isPending ? "not-allowed" : "pointer" }}
+          disabled={spinning}
+          className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded transition-colors hover:bg-bg-hover"
+          style={{
+            fontSize: 12,
+            background: btnBg,
+            color: btnColor,
+            cursor: spinning ? "not-allowed" : "pointer",
+            minWidth: 120,
+          }}
         >
           <RefreshCw
             style={{
-              width: 12, height: 12,
+              width: 12, height: 12, flexShrink: 0,
               animation: spinning ? "spin 0.8s linear infinite" : "none",
             }}
           />
-          Refresh
+          <span className="truncate">
+            {state === "idle" ? "Refresh prices" : statusMsg}
+          </span>
         </button>
       </div>
     </header>
