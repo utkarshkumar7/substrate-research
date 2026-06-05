@@ -19,19 +19,8 @@ export interface ClosePoint {
 
 interface Props {
   symbol: string
-  symbolCloses: ClosePoint[]
+  symbolCloses: ClosePoint[]   // ASC sorted (oldest first)
   yahooSymbol?: string
-}
-
-const YTD_START = `${new Date().getFullYear()}-01-01`
-
-function trimToYTD(closes: ClosePoint[]): ClosePoint[] {
-  const filtered = closes.filter(c => c.date >= YTD_START)
-  if (filtered.length && filtered[0].date > YTD_START) {
-    const prev = closes.filter(c => c.date < YTD_START).pop()
-    if (prev) return [prev, ...filtered]
-  }
-  return filtered
 }
 
 function formatDate(iso: string): string {
@@ -60,31 +49,46 @@ function CustomTooltip({ active, payload, label }: any) {
 }
 
 export default function PriceChart({ symbol, symbolCloses, yahooSymbol }: Props) {
-  const chartData = useMemo(() => {
-    const trimmed = trimToYTD(symbolCloses)
-    if (!trimmed.length) return []
-    const base = trimmed[0].close
-    return trimmed
-      .filter(c => c.date >= YTD_START)
-      .map(c => ({
-        date: c.date,
-        pct: parseFloat(((c.close / base - 1) * 100).toFixed(2)),
-      }))
+  const { chartData, lastVal } = useMemo(() => {
+    const ytdStart = `${new Date().getFullYear()}-01-01`
+
+    // Find the last close before Jan 1 as the YTD base
+    const preYTD = symbolCloses.filter(c => c.date < ytdStart)
+    const ytdCloses = symbolCloses.filter(c => c.date >= ytdStart)
+
+    if (!ytdCloses.length) return { chartData: [], lastVal: 0 }
+
+    // Use last pre-YTD close as base; fall back to first YTD close
+    const base = preYTD.length ? preYTD[preYTD.length - 1].close : ytdCloses[0].close
+
+    const data = ytdCloses.map(c => ({
+      date: c.date,
+      pct: parseFloat(((c.close / base - 1) * 100).toFixed(2)),
+    }))
+
+    return { chartData: data, lastVal: data[data.length - 1]?.pct ?? 0 }
   }, [symbolCloses])
 
   const yahooUrl = `https://finance.yahoo.com/quote/${encodeURIComponent(yahooSymbol ?? symbol)}`
-
-  // Color the line based on whether YTD is positive or negative
-  const lastVal = chartData[chartData.length - 1]?.pct ?? 0
   const lineColor = lastVal >= 0 ? "#4ade80" : "#f87171"
+
+  // Explicit domain with padding so the line is never clipped
+  const pcts = chartData.map(d => d.pct)
+  const minPct = pcts.length ? Math.min(...pcts) : -5
+  const maxPct = pcts.length ? Math.max(...pcts) : 5
+  const pad = Math.max(2, (maxPct - minPct) * 0.1)
+  const domain: [number, number] = [
+    parseFloat((minPct - pad).toFixed(1)),
+    parseFloat((maxPct + pad).toFixed(1)),
+  ]
 
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
         <span className="text-text-muted font-mono" style={{ fontSize: 10 }}>
           YTD return %
-          {lastVal !== 0 && (
-            <span style={{ marginLeft: 8, color: lastVal >= 0 ? "#4ade80" : "#f87171" }}>
+          {chartData.length > 0 && (
+            <span style={{ marginLeft: 8, color: lineColor }}>
               {lastVal >= 0 ? "+" : ""}{lastVal.toFixed(1)}%
             </span>
           )}
@@ -100,38 +104,46 @@ export default function PriceChart({ symbol, symbolCloses, yahooSymbol }: Props)
         </a>
       </div>
 
-      <ResponsiveContainer width="100%" height={200}>
-        <LineChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1f2127" vertical={false} />
-          <ReferenceLine y={0} stroke="#2a2c33" strokeWidth={1} />
-          <XAxis
-            dataKey="date"
-            tick={{ fill: "#6b7280", fontSize: 10, fontFamily: "Menlo, ui-monospace, monospace" }}
-            tickLine={false}
-            axisLine={false}
-            interval="preserveStartEnd"
-            tickFormatter={formatMonth}
-            minTickGap={40}
-          />
-          <YAxis
-            tick={{ fill: "#6b7280", fontSize: 10, fontFamily: "Menlo, ui-monospace, monospace" }}
-            tickLine={false}
-            axisLine={false}
-            tickFormatter={(v: number) => `${v > 0 ? "+" : ""}${v.toFixed(0)}%`}
-            width={44}
-          />
-          <Tooltip content={<CustomTooltip />} />
-          <Line
-            type="monotone"
-            dataKey="pct"
-            name={symbol}
-            stroke={lineColor}
-            strokeWidth={1.5}
-            dot={false}
-            activeDot={{ r: 3, fill: lineColor }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+      {chartData.length === 0 ? (
+        <div className="text-text-muted text-center py-12" style={{ fontSize: 12 }}>
+          No YTD data available.
+        </div>
+      ) : (
+        <ResponsiveContainer width="100%" height={200}>
+          <LineChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: -12 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#1f2127" vertical={false} />
+            <ReferenceLine y={0} stroke="#2a2c33" strokeWidth={1} />
+            <XAxis
+              dataKey="date"
+              tick={{ fill: "#6b7280", fontSize: 10, fontFamily: "Menlo, ui-monospace, monospace" }}
+              tickLine={false}
+              axisLine={false}
+              interval="preserveStartEnd"
+              tickFormatter={formatMonth}
+              minTickGap={40}
+            />
+            <YAxis
+              domain={domain}
+              tick={{ fill: "#6b7280", fontSize: 10, fontFamily: "Menlo, ui-monospace, monospace" }}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(v: number) => `${v > 0 ? "+" : ""}${v.toFixed(0)}%`}
+              width={44}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Line
+              type="monotone"
+              dataKey="pct"
+              name={symbol}
+              stroke={lineColor}
+              strokeWidth={1.5}
+              dot={false}
+              isAnimationActive={false}
+              activeDot={{ r: 3, fill: lineColor }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      )}
     </div>
   )
 }
