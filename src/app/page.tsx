@@ -65,11 +65,7 @@ export default async function HomePage() {
           sub={coldest ? formatPercent(coldest.score) + "%" : undefined}
           subColor={coldest && coldest.score < 0 ? "#f87171" : "#71717a"}
         />
-        <MetricCard
-          label="Open anomalies"
-          value="—"
-          sub="Phase 7"
-        />
+        <OpenAnomaliesCard />
       </div>
 
       {/* Pipeline graph */}
@@ -102,6 +98,52 @@ export default async function HomePage() {
         <HeatmapGrid />
       </div>
     </div>
+  )
+}
+
+async function OpenAnomaliesCard() {
+  const client = createClient()
+  const since = new Date()
+  since.setDate(since.getDate() - 30)
+  const { count: anomalyCount } = await client
+    .from("insights")
+    .select("id", { count: "exact", head: true })
+    .in("kind", ["anomaly", "flow", "signal"])
+    .gte("created_at", since.toISOString())
+
+  // Also count live volume spikes from prices
+  const symbols = fetchableSymbols()
+  const sincePrices = new Date()
+  sincePrices.setDate(sincePrices.getDate() - 35)
+  const { data: priceRows } = await client
+    .from("prices")
+    .select("symbol, volume")
+    .in("symbol", symbols)
+    .gte("trade_date", sincePrices.toISOString().slice(0, 10))
+    .order("trade_date", { ascending: false })
+
+  const volBySymbol: Record<string, number[]> = {}
+  for (const row of priceRows ?? []) {
+    if (row.volume == null) continue
+    ;(volBySymbol[row.symbol] ??= []).push(Number(row.volume))
+  }
+  let spikeCount = 0
+  for (const vols of Object.values(volBySymbol)) {
+    if (vols.length < 10) continue
+    const avg = vols.slice(1, 31).reduce((a, b) => a + b, 0) / Math.min(vols.length - 1, 30)
+    const std = Math.sqrt(vols.slice(1, 31).reduce((a, b) => a + (b - avg) ** 2, 0) / Math.min(vols.length - 1, 30))
+    if (std > 0 && (vols[0] - avg) / std >= 2.0) spikeCount++
+  }
+
+  const total = (anomalyCount ?? 0) + spikeCount
+  return (
+    <MetricCard
+      label="Open anomalies"
+      value={total > 0 ? String(total) : "—"}
+      valueColor={total > 0 ? "#f87171" : undefined}
+      sub={total > 0 ? `${spikeCount} vol spike${spikeCount !== 1 ? "s" : ""} · ${anomalyCount ?? 0} signal${(anomalyCount ?? 0) !== 1 ? "s" : ""}` : "No alerts"}
+      subColor={total > 0 ? "#f87171" : undefined}
+    />
   )
 }
 

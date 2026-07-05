@@ -61,7 +61,7 @@ export default function PortfolioClient({ holdings: initialHoldings, slices: ini
         totalPnlPct={totalPnlPct}
       />
 
-      <div className="grid gap-6 mt-6" style={{ gridTemplateColumns: "1fr 340px" }}>
+      <div className="grid gap-6 mt-6" style={{ gridTemplateColumns: "1fr 360px" }}>
         {/* Holdings Table */}
         <div>
           <div className="flex items-center justify-between mb-3">

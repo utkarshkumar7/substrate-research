@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { formatCurrency } from "@/lib/format"
 
 export interface LayerSlice {
   layer: string
@@ -14,8 +15,8 @@ interface Props {
   slices: LayerSlice[]
 }
 
-const R = 70        // outer radius
-const R_INNER = 46  // inner radius (donut hole)
+const R = 72
+const R_INNER = 48
 const CX = 90
 const CY = 90
 const SIZE = 180
@@ -47,13 +48,12 @@ export default function PortfolioDonut({ slices }: Props) {
 
   if (!slices.length) {
     return (
-      <div className="flex items-center justify-center" style={{ height: 200 }}>
+      <div className="flex items-center justify-center" style={{ height: 120 }}>
         <span className="text-text-muted" style={{ fontSize: 12 }}>No holdings yet</span>
       </div>
     )
   }
 
-  // Build arc segments
   const GAP_DEG = slices.length > 1 ? 2 : 0
   const total = slices.reduce((s, sl) => s + sl.pct, 0)
   const segments: Array<{ slice: LayerSlice; start: number; end: number }> = []
@@ -65,62 +65,64 @@ export default function PortfolioDonut({ slices }: Props) {
   }
 
   const hoveredSlice = hovered ? slices.find((s) => s.layer === hovered) : null
+  const totalValue = slices.reduce((s, sl) => s + sl.value, 0)
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex flex-col items-center gap-4">
       {/* SVG donut */}
-      <div style={{ flexShrink: 0 }}>
-        <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}>
-          {segments.map(({ slice, start, end }) => (
-            <path
-              key={slice.layer}
-              d={slicePath(CX, CY, R, R_INNER, start, end)}
-              fill={slice.color}
-              opacity={hovered && hovered !== slice.layer ? 0.35 : 1}
-              style={{ cursor: "pointer", transition: "opacity 0.15s" }}
-              onMouseEnter={() => setHovered(slice.layer)}
-              onMouseLeave={() => setHovered(null)}
-            />
-          ))}
+      <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}>
+        {segments.map(({ slice, start, end }) => (
+          <path
+            key={slice.layer}
+            d={slicePath(CX, CY, R, R_INNER, start, end)}
+            fill={slice.color}
+            opacity={hovered && hovered !== slice.layer ? 0.25 : 1}
+            style={{ cursor: "pointer", transition: "opacity 0.15s" }}
+            onMouseEnter={() => setHovered(slice.layer)}
+            onMouseLeave={() => setHovered(null)}
+          />
+        ))}
 
-          {/* Center label */}
-          {hoveredSlice ? (
-            <>
-              <text x={CX} y={CY - 7} textAnchor="middle" fill="#e8e9ec" fontSize={13} fontWeight={600}>
-                {hoveredSlice.pct.toFixed(1)}%
-              </text>
-              <text x={CX} y={CY + 10} textAnchor="middle" fill="#6b7280" fontSize={9}>
-                {hoveredSlice.label.split(" ")[0]}
-              </text>
-            </>
-          ) : (
-            <>
-              <text x={CX} y={CY - 5} textAnchor="middle" fill="#9ca3af" fontSize={11}>
-                {slices.length}
-              </text>
-              <text x={CX} y={CY + 9} textAnchor="middle" fill="#6b7280" fontSize={9}>
-                layers
-              </text>
-            </>
-          )}
-        </svg>
-      </div>
+        {/* Center label */}
+        {hoveredSlice ? (
+          <>
+            <text x={CX} y={CY - 8} textAnchor="middle" fill="#e8e9ec" fontSize={14} fontWeight={600}>
+              {hoveredSlice.pct.toFixed(1)}%
+            </text>
+            <text x={CX} y={CY + 8} textAnchor="middle" fill="#6b7280" fontSize={9} fontFamily="monospace">
+              {formatCurrency(hoveredSlice.value)}
+            </text>
+          </>
+        ) : (
+          <>
+            <text x={CX} y={CY - 5} textAnchor="middle" fill="#e8e9ec" fontSize={12} fontWeight={600}>
+              {formatCurrency(totalValue)}
+            </text>
+            <text x={CX} y={CY + 10} textAnchor="middle" fill="#6b7280" fontSize={9}>
+              {slices.length} layers
+            </text>
+          </>
+        )}
+      </svg>
 
-      {/* Legend */}
-      <div className="flex flex-col gap-2.5 flex-1">
+      {/* Legend grid — 2 columns */}
+      <div className="w-full grid gap-x-4 gap-y-2.5" style={{ gridTemplateColumns: "1fr 1fr" }}>
         {slices.map((s) => (
           <div
             key={s.layer}
-            className="flex items-center gap-2"
-            style={{ cursor: "default", opacity: hovered && hovered !== s.layer ? 0.4 : 1, transition: "opacity 0.15s" }}
+            className="flex items-start gap-2 cursor-default"
+            style={{ opacity: hovered && hovered !== s.layer ? 0.3 : 1, transition: "opacity 0.15s" }}
             onMouseEnter={() => setHovered(s.layer)}
             onMouseLeave={() => setHovered(null)}
           >
-            <div className="rounded-full shrink-0" style={{ width: 8, height: 8, background: s.color }} />
-            <span className="text-text-secondary flex-1" style={{ fontSize: 12 }}>{s.label}</span>
-            <span className="font-mono text-text" style={{ fontSize: 12, minWidth: 44, textAlign: "right" }}>
-              {s.pct.toFixed(1)}%
-            </span>
+            <div className="rounded-sm shrink-0 mt-0.5" style={{ width: 8, height: 8, background: s.color }} />
+            <div className="min-w-0">
+              <div className="text-text-secondary leading-tight" style={{ fontSize: 11 }}>{s.label}</div>
+              <div className="flex items-baseline gap-1.5 mt-0.5">
+                <span className="font-mono font-semibold text-text" style={{ fontSize: 12 }}>{s.pct.toFixed(1)}%</span>
+                <span className="font-mono text-text-muted" style={{ fontSize: 10 }}>{formatCurrency(s.value)}</span>
+              </div>
+            </div>
           </div>
         ))}
       </div>
