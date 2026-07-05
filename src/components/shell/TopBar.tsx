@@ -61,10 +61,30 @@ export default function TopBar() {
           fill="none"
           aria-label="Substrate"
         >
-          <circle cx={24} cy={24} r={16} stroke="var(--color-accent)" strokeWidth={2.6} />
-          <circle cx={24} cy={24} r={6.5} fill="var(--color-accent)" />
-          {/* wafer orientation notch */}
-          <rect x={21} y={36.5} width={6} height={5} rx={1} fill="var(--color-bg-card)" />
+          <defs>
+            <clipPath id="waferClip">
+              <circle cx={24} cy={24} r={16.5} />
+            </clipPath>
+          </defs>
+          {/* polished disc face */}
+          <circle cx={24} cy={24} r={16.5} fill="var(--color-accent)" fillOpacity={0.1} />
+          {/* die grid (the array of chips printed on the wafer) */}
+          <g clipPath="url(#waferClip)" stroke="var(--color-accent)" strokeWidth={0.9} strokeOpacity={0.5}>
+            <line x1={15} y1={6} x2={15} y2={42} />
+            <line x1={21} y1={6} x2={21} y2={42} />
+            <line x1={27} y1={6} x2={27} y2={42} />
+            <line x1={33} y1={6} x2={33} y2={42} />
+            <line x1={6} y1={15} x2={42} y2={15} />
+            <line x1={6} y1={21} x2={42} y2={21} />
+            <line x1={6} y1={27} x2={42} y2={27} />
+            <line x1={6} y1={33} x2={42} y2={33} />
+          </g>
+          {/* the flagship die at center */}
+          <rect x={21} y={21} width={6} height={6} fill="var(--color-accent)" clipPath="url(#waferClip)" />
+          {/* wafer edge */}
+          <circle cx={24} cy={24} r={16.5} stroke="var(--color-accent)" strokeWidth={2.2} />
+          {/* orientation notch carved into the edge */}
+          <path d="M21.5 41 L26.5 41 L24 35.5 Z" fill="var(--color-bg-card)" />
         </svg>
         <span style={{ fontSize: 14 }}>Substrate</span>
         <span className="text-text-muted font-normal" style={{ fontSize: 14 }}>

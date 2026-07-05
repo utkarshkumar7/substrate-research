@@ -3,7 +3,7 @@ import type { Topology } from './types';
 
 export const TOPOLOGY: Topology = {
   "metadata": {
-    "name": "AI Supply Chain Command Center",
+    "name": "Substrate",
     "description": "Pipeline from silicon to chatbot",
     "version": 2,
     "lastUpdated": "2026-05-20"
