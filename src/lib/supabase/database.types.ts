@@ -314,7 +314,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_heatmap_snapshots: {
+        Args: { p_symbols: string[] }
+        Returns: {
+          symbol: string
+          latest_close: number
+          latest_date: string
+          pct_1d: number | null
+          pct_5d: number | null
+          pct_1m: number | null
+          pct_ytd: number | null
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
