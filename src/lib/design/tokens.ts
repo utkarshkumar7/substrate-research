@@ -22,6 +22,6 @@ export const COLORS = {
   up:           "#4ade80",
   down:         "#f87171",
   neutral:      "#71717a",
-  accent:       "#a78bfa",
+  accent:       "#f0a24e",
   accent2:      "#22d3ee",
 } as const;

@@ -42,8 +42,8 @@ function AssistantBubble({ content, streaming = false }: { content: string; stre
         <svg width="10" height="10" viewBox="0 0 10 10">
           <defs>
             <radialGradient id="brand-dot" cx="35%" cy="35%">
-              <stop offset="0%" stopColor="#a78bfa" />
-              <stop offset="100%" stopColor="#22d3ee" />
+              <stop offset="0%" stopColor="#f6c489" />
+              <stop offset="100%" stopColor="#e07b3a" />
             </radialGradient>
           </defs>
           <circle cx="5" cy="5" r="5" fill="url(#brand-dot)" />
@@ -92,7 +92,7 @@ function AssistantBubble({ content, streaming = false }: { content: string; stre
                 <td style={{ padding: "4px 10px", color: "#9ca3af", borderBottom: "1px solid #111217", whiteSpace: "nowrap" }}>{children}</td>
               ),
               code: ({ children }) => (
-                <code style={{ fontSize: 12, background: "#16171c", padding: "1px 5px", borderRadius: 4, color: "#a78bfa", fontFamily: "monospace" }}>{children}</code>
+                <code style={{ fontSize: 12, background: "#16171c", padding: "1px 5px", borderRadius: 4, color: "#f0a24e", fontFamily: "monospace" }}>{children}</code>
               ),
             }}
           >
@@ -104,7 +104,7 @@ function AssistantBubble({ content, streaming = false }: { content: string; stre
               style={{
                 width: 7,
                 height: 14,
-                background: "#a78bfa",
+                background: "#f0a24e",
                 opacity: 0.9,
                 marginLeft: 2,
                 verticalAlign: "text-bottom",

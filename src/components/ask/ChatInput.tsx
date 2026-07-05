@@ -110,7 +110,7 @@ export default function ChatInput({
           style={{
             width: 32,
             height: 32,
-            background: canSend ? "#a78bfa" : "#1a1b21",
+            background: canSend ? "#f0a24e" : "#1a1b21",
             border: "none",
             cursor: canSend ? "pointer" : "not-allowed",
           }}

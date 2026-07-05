@@ -182,7 +182,7 @@ export default async function AnomaliesPage() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <span className="rounded-sm shrink-0" style={{ width: 4, height: 14, background: LAYER_COLORS[s.layer] ?? "#71717a" }} />
-                        <a href={`/ticker/${s.symbol}`} className="font-mono font-semibold hover:text-accent transition-colors" style={{ fontSize: 13, color: "#a78bfa" }}>
+                        <a href={`/ticker/${s.symbol}`} className="font-mono font-semibold hover:text-accent transition-colors" style={{ fontSize: 13, color: "#f0a24e" }}>
                           {s.symbol}
                         </a>
                       </div>

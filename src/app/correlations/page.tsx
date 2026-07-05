@@ -182,9 +182,9 @@ export default async function CorrelationsPage() {
                     >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <a href={`/ticker/${pair.sym1}`} className="font-mono font-semibold hover:text-accent transition-colors" style={{ fontSize: 13, color: "#a78bfa" }}>{pair.sym1}</a>
+                          <a href={`/ticker/${pair.sym1}`} className="font-mono font-semibold hover:text-accent transition-colors" style={{ fontSize: 13, color: "#f0a24e" }}>{pair.sym1}</a>
                           <span className="text-text-muted" style={{ fontSize: 11 }}>×</span>
-                          <a href={`/ticker/${pair.sym2}`} className="font-mono font-semibold hover:text-accent transition-colors" style={{ fontSize: 13, color: "#a78bfa" }}>{pair.sym2}</a>
+                          <a href={`/ticker/${pair.sym2}`} className="font-mono font-semibold hover:text-accent transition-colors" style={{ fontSize: 13, color: "#f0a24e" }}>{pair.sym2}</a>
                         </div>
                       </td>
                       <td className="px-3 py-3">

@@ -64,8 +64,8 @@ export default async function ClaudeTake(props: Props) {
           style={{
             fontSize: 9,
             padding: "2px 6px",
-            color: "#a78bfa",
-            background: "rgba(167,139,250,0.10)",
+            color: "#f0a24e",
+            background: "rgba(240,162,78,0.10)",
             letterSpacing: "0.06em",
           }}
         >

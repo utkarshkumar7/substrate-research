@@ -77,7 +77,7 @@ export default function PullbackTable({ metrics }: Props) {
               <th
                 key={c.key}
                 className="text-right px-3 py-3 cursor-pointer select-none"
-                style={{ fontSize: 11, fontWeight: sortKey === c.key ? 600 : 500, color: sortKey === c.key ? "#a78bfa" : "#6b7280" }}
+                style={{ fontSize: 11, fontWeight: sortKey === c.key ? 600 : 500, color: sortKey === c.key ? "#f0a24e" : "#6b7280" }}
                 onClick={() => handleSort(c.key)}
               >
                 {c.label} {sortKey === c.key ? (sortAsc ? "↑" : "↓") : ""}
@@ -102,7 +102,7 @@ export default function PullbackTable({ metrics }: Props) {
                   <Link
                     href={`/ticker/${m.symbol}`}
                     className="font-mono font-semibold hover:text-accent transition-colors"
-                    style={{ fontSize: 13, color: "#a78bfa" }}
+                    style={{ fontSize: 13, color: "#f0a24e" }}
                   >
                     {m.symbol}
                   </Link>

@@ -8,7 +8,7 @@ import { addEntry, updateEntry, removeEntry } from "./actions"
 
 const STATUS_COLORS: Record<string, string> = {
   watching: "#71717a",
-  open:     "#a78bfa",
+  open:     "#f0a24e",
   closed:   "#4ade80",
 }
 
@@ -273,7 +273,7 @@ export default function JournalClient({ initialEntries, latestPrices = {}, prefi
           className="rounded-lg border transition-colors"
           style={{
             fontSize: 13, padding: "7px 16px", fontWeight: 500,
-            background: showForm ? "#1a1b21" : "#a78bfa",
+            background: showForm ? "#1a1b21" : "#f0a24e",
             color: showForm ? "#9ca3af" : "#0a0b0e",
             border: showForm ? "1px solid #1f2127" : "none",
             cursor: "pointer",
@@ -292,7 +292,7 @@ export default function JournalClient({ initialEntries, latestPrices = {}, prefi
             disabled={isPending || !form.thesis.trim()}
             className="rounded-lg transition-colors"
             style={{
-              background: form.thesis.trim() ? "#a78bfa" : "#1a1b21",
+              background: form.thesis.trim() ? "#f0a24e" : "#1a1b21",
               color: form.thesis.trim() ? "#0a0b0e" : "#4b5563",
               padding: "8px 20px", fontSize: 13, fontWeight: 600,
               border: "none", cursor: form.thesis.trim() ? "pointer" : "not-allowed",
@@ -351,7 +351,7 @@ export default function JournalClient({ initialEntries, latestPrices = {}, prefi
                   href={`/ticker/${entry.symbol}`}
                   onClick={e => e.stopPropagation()}
                   className="font-mono font-semibold hover:underline"
-                  style={{ fontSize: 13, color: "#a78bfa" }}
+                  style={{ fontSize: 13, color: "#f0a24e" }}
                 >
                   {entry.symbol}
                 </Link>
@@ -465,7 +465,7 @@ export default function JournalClient({ initialEntries, latestPrices = {}, prefi
                 disabled={isPending || !editForm.thesis.trim()}
                 className="rounded-lg transition-colors"
                 style={{
-                  background: editForm.thesis.trim() ? "#a78bfa" : "#1a1b21",
+                  background: editForm.thesis.trim() ? "#f0a24e" : "#1a1b21",
                   color: editForm.thesis.trim() ? "#0a0b0e" : "#4b5563",
                   padding: "7px 18px", fontSize: 12, fontWeight: 600,
                   border: "none", cursor: editForm.thesis.trim() ? "pointer" : "not-allowed",

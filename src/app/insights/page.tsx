@@ -6,7 +6,7 @@ const KIND_COLOR: Record<string, string> = {
   anomaly: "#f87171",
   signal:  "#22d3ee",
   flow:    "#4ade80",
-  context: "#a78bfa",
+  context: "#f0a24e",
 }
 
 const SIGNAL_KINDS = ["anomaly", "signal", "flow", "context"]

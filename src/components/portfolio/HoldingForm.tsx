@@ -211,7 +211,7 @@ export default function HoldingForm({ initial, onSaved, onClose }: Props) {
             style={{
               fontSize: 13,
               padding: "9px",
-              background: canSave && !saving ? "#a78bfa" : "#1a1b21",
+              background: canSave && !saving ? "#f0a24e" : "#1a1b21",
               color: canSave && !saving ? "#0a0b0e" : "#4b5563",
               cursor: canSave && !saving ? "pointer" : "not-allowed",
             }}

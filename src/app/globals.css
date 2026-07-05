@@ -61,7 +61,7 @@
 @keyframes wafer-spin { to { transform: rotate(360deg); } }
 .wafer-mark {
   transform-origin: center;
-  animation: wafer-spin 9s linear infinite;
+  animation: wafer-spin 16s linear infinite;
 }
 .wafer-mark.is-refreshing { animation-duration: 0.8s; }
 @media (prefers-reduced-motion: reduce) {

@@ -92,7 +92,7 @@ export default function DailyClient({ reports: initialReports }: Props) {
                 cursor: "pointer",
               }}
             >
-              <div className="font-mono" style={{ fontSize: 12, color: selectedId === r.id ? "#a78bfa" : "#e8e9ec" }}>
+              <div className="font-mono" style={{ fontSize: 12, color: selectedId === r.id ? "#f0a24e" : "#e8e9ec" }}>
                 {formatDay(r.created_at)}
               </div>
             </button>
@@ -122,7 +122,7 @@ export default function DailyClient({ reports: initialReports }: Props) {
             disabled={generating}
             className="rounded-lg transition-colors flex items-center gap-2 shrink-0"
             style={{
-              background: generating ? "#1a1b21" : "#a78bfa",
+              background: generating ? "#1a1b21" : "#f0a24e",
               color: generating ? "#6b7280" : "#0a0b0e",
               padding: "8px 18px", fontSize: 13, fontWeight: 600,
               border: generating ? "1px solid #1f2127" : "none",
@@ -162,7 +162,7 @@ export default function DailyClient({ reports: initialReports }: Props) {
               components={{
                 h1: ({ children }) => <h1 style={{ fontSize: 18, fontWeight: 700, color: "#e8e9ec", marginTop: 24, marginBottom: 8 }}>{children}</h1>,
                 h2: ({ children }) => <h2 style={{ fontSize: 15, fontWeight: 600, color: "#e8e9ec", marginTop: 20, marginBottom: 6 }}>{children}</h2>,
-                strong: ({ children }) => <strong style={{ color: "#a78bfa", fontWeight: 600 }}>{children}</strong>,
+                strong: ({ children }) => <strong style={{ color: "#f0a24e", fontWeight: 600 }}>{children}</strong>,
                 p: ({ children }) => <p style={{ marginBottom: 12, color: "#9ca3af", lineHeight: 1.7 }}>{children}</p>,
                 ul: ({ children }) => <ul style={{ paddingLeft: 20, marginBottom: 12 }}>{children}</ul>,
                 li: ({ children }) => <li style={{ color: "#9ca3af", marginBottom: 4 }}>{children}</li>,
