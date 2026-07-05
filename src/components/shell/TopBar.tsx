@@ -49,7 +49,7 @@ export default function TopBar({ dataDate }: { dataDate: string | null }) {
 
   return (
     <header
-      className="flex items-center gap-0 px-6 bg-bg-card border-b border-border sticky top-0 z-50"
+      className="relative flex items-center gap-0 px-6 bg-bg-card border-b border-border sticky top-0 z-50"
       style={{ height: "56px" }}
     >
       {/* Brand */}
@@ -87,14 +87,15 @@ export default function TopBar({ dataDate }: { dataDate: string | null }) {
           {/* orientation notch carved into the edge */}
           <path d="M21.5 41 L26.5 41 L24 35.5 Z" fill="var(--color-bg-card)" />
         </svg>
-        <span style={{ fontSize: 14 }}>Substrate</span>
-        <span className="text-text-muted font-normal" style={{ fontSize: 14 }}>
-          / supply chain
-        </span>
+        <span style={{ fontSize: 16 }}>Substrate</span>
       </div>
 
-      {/* Search */}
-      <SearchBox />
+      {/* Search — centered in the header */}
+      <div className="absolute left-1/2 -translate-x-1/2 w-full max-w-[480px] px-4 flex justify-center pointer-events-none">
+        <div className="w-full pointer-events-auto">
+          <SearchBox />
+        </div>
+      </div>
 
       {/* Right */}
       <div className="flex items-center gap-2 ml-auto">

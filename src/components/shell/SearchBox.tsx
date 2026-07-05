@@ -86,7 +86,7 @@ export default function SearchBox() {
   const showDropdown = open && results.length > 0;
 
   return (
-    <div className="flex-1 max-w-[480px] mx-6 relative">
+    <div className="relative w-full max-w-[480px]">
       <Search
         className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none"
         style={{ width: 14, height: 14 }}

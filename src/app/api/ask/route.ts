@@ -85,7 +85,7 @@ async function buildSystemPrompt(supabase: SupabaseClient<Database>): Promise<st
 
   return `You are an AI supply chain equity analyst for a personal research dashboard. Today: ${today}.
 
-The dashboard tracks ~65 equities across the AI supply chain from silicon to chatbot.
+The dashboard tracks ~65 equities across the AI supply chain from silicon to inference and agents.
 
 SUPPLY CHAIN LAYERS (order: raw materials → energy/storage → foundries → chip design/photonics → datacenter → apps):
 ${layerLines}

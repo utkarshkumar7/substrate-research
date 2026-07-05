@@ -75,7 +75,7 @@ export default async function HomePage() {
             AI supply chain pipeline
           </div>
           <div className="text-text-muted" style={{ fontSize: 12 }}>
-            Silicon → chatbot
+            Silicon → inference/agents
           </div>
         </div>
         <PipelineGraph snapshots={snapshots} />

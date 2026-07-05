@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { fetchableSymbols, layersInOrder, tickersByLayer } from "@/lib/topology"
 import { getHeatmapSnapshot } from "@/lib/queries/prices"
 import { pctForPeriod, medianPct } from "@/lib/analytics/performance"
-import { formatPercent } from "@/lib/format"
+import { formatPercent, stripMarkdown } from "@/lib/format"
 
 export const metadata = { title: "Anomalies" }
 
@@ -45,6 +45,7 @@ export default async function AnomaliesPage() {
       .from("insights")
       .select("id, kind, title, body, created_at")
       .in("kind", ["anomaly", "signal", "flow"])
+      .gte("created_at", new Date(Date.now() - 7 * 864e5).toISOString())
       .order("created_at", { ascending: false })
       .limit(20),
   ])
@@ -229,7 +230,7 @@ export default async function AnomaliesPage() {
                   </span>
                 </div>
                 <p className="text-text-secondary line-clamp-3" style={{ fontSize: 12, lineHeight: 1.6 }}>
-                  {ins.body}
+                  {stripMarkdown(ins.body)}
                 </p>
               </div>
             ))}

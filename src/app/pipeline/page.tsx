@@ -14,7 +14,7 @@ export default async function PipelinePage() {
           Supply chain pipeline
         </h1>
         <span className="text-text-muted" style={{ fontSize: 13 }}>
-          Silicon → chatbot
+          Silicon → inference/agents
         </span>
       </div>
       <div className="bg-bg-card border border-border rounded-xl" style={{ padding: "20px 24px" }}>
