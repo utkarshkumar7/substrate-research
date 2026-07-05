@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
+import SearchBox from "./SearchBox";
 
 type RefreshState = "idle" | "pulling" | "done" | "error"
 
-export default function TopBar() {
+export default function TopBar({ dataDate }: { dataDate: string | null }) {
   const router = useRouter();
   const [state, setState] = useState<RefreshState>("idle");
   const [statusMsg, setStatusMsg] = useState("");
@@ -93,18 +94,7 @@ export default function TopBar() {
       </div>
 
       {/* Search */}
-      <div className="flex-1 max-w-[480px] mx-6 relative">
-        <Search
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"
-          style={{ width: 14, height: 14 }}
-        />
-        <input
-          type="text"
-          placeholder="Search tickers, layers, or ask Claude…"
-          className="w-full bg-bg border border-border rounded-md pl-9 pr-3 py-2 text-text placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent"
-          style={{ fontSize: 13 }}
-        />
-      </div>
+      <SearchBox />
 
       {/* Right */}
       <div className="flex items-center gap-2 ml-auto">
@@ -113,7 +103,7 @@ export default function TopBar() {
           style={{ fontSize: 11 }}
         >
           <span className="inline-block rounded-full bg-up" style={{ width: 6, height: 6 }} />
-          EOD data · {new Date().toISOString().slice(0, 10)}
+          EOD data · {dataDate ?? "—"}
         </div>
 
         <button
