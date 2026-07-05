@@ -1,28 +1,28 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Surfaces */
-  --color-bg:         #0a0b0e;
-  --color-bg-card:    #111217;
-  --color-bg-card-2:  #16171c;
-  --color-bg-hover:   #1a1b21;
+  /* Surfaces — warm near-black ("molten") ground */
+  --color-bg:         #0b0a08;
+  --color-bg-card:    #14110d;
+  --color-bg-card-2:  #191510;
+  --color-bg-hover:   #1e1811;
 
   /* Borders */
-  --color-border:        #1f2127;
-  --color-border-strong: #2a2c33;
+  --color-border:        #241e16;
+  --color-border-strong: #322a1f;
 
-  /* Text */
-  --color-text:           #e8e9ec;
-  --color-text-secondary: #9ca3af;
-  --color-text-muted:     #6b7280;
+  /* Text — warm off-white */
+  --color-text:           #ece7df;
+  --color-text-secondary: #a49a8b;
+  --color-text-muted:     #726859;
 
   /* Semantic */
   --color-up:      #4ade80;
   --color-down:    #f87171;
   --color-neutral: #71717a;
 
-  /* Accents */
-  --color-accent:   #a78bfa;
+  /* Accents — amber brand (silicon heat); cyan stays reserved for hot strand */
+  --color-accent:   #f0a24e;
   --color-accent-2: #22d3ee;
 
   /* Layer colors */
@@ -55,6 +55,17 @@
   --font-size-xl:   18px;
   --font-size-2xl:  22px;
   --font-size-3xl:  28px;
+}
+
+/* ── Wafer brand mark: slow idle rotation, fast while refreshing ── */
+@keyframes wafer-spin { to { transform: rotate(360deg); } }
+.wafer-mark {
+  transform-origin: center;
+  animation: wafer-spin 9s linear infinite;
+}
+.wafer-mark.is-refreshing { animation-duration: 0.8s; }
+@media (prefers-reduced-motion: reduce) {
+  .wafer-mark { animation: none; }
 }
 
 /* ── Heat cell buckets (match mockup exactly) ───────────────────── */

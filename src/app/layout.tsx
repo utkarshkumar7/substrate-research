@@ -8,7 +8,7 @@ import AppShell from "@/components/shell/AppShell";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "AI Command Center",
+  title: "Substrate",
   description: "AI supply chain research dashboard",
 };
 

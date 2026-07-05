@@ -53,18 +53,20 @@ export default function TopBar() {
     >
       {/* Brand */}
       <div className="flex items-center gap-2.5 font-semibold tracking-tight shrink-0">
-        <div
-          className="flex items-center justify-center font-bold text-bg rounded"
-          style={{
-            width: 24,
-            height: 24,
-            fontSize: 11,
-            background: "linear-gradient(135deg, var(--color-accent), var(--color-accent-2))",
-          }}
+        <svg
+          className={`wafer-mark${spinning ? " is-refreshing" : ""}`}
+          width={24}
+          height={24}
+          viewBox="0 0 48 48"
+          fill="none"
+          aria-label="Substrate"
         >
-          AI
-        </div>
-        <span style={{ fontSize: 14 }}>Command Center</span>
+          <circle cx={24} cy={24} r={16} stroke="var(--color-accent)" strokeWidth={2.6} />
+          <circle cx={24} cy={24} r={6.5} fill="var(--color-accent)" />
+          {/* wafer orientation notch */}
+          <rect x={21} y={36.5} width={6} height={5} rx={1} fill="var(--color-bg-card)" />
+        </svg>
+        <span style={{ fontSize: 14 }}>Substrate</span>
         <span className="text-text-muted font-normal" style={{ fontSize: 14 }}>
           / supply chain
         </span>
