@@ -4,13 +4,13 @@ Operating instructions for Claude Code working in this repo. Read this first eve
 
 ## What this is
 
-Personal AI-supply-chain research dashboard. Tracks ~50 equities across 8 layers (raw materials → energy → foundries → chip design → datacenter → applications, plus parallel storage and quantum). Hero view is a left-to-right pipeline graph. EOD data, medium/long-term horizon. Single user, local-first.
+Personal AI-supply-chain research dashboard ("Substrate"). Tracks ~70 equities across 9 layers (raw materials → energy → foundries → chip design → datacenter → applications, plus parallel storage, quantum, and photonics). Hero view is a left-to-right pipeline graph. EOD data, medium/long-term horizon. Single user, local-first.
 
 ## Tech stack — locked, do not re-deliberate
 
-- **Frontend:** Next.js 15 (App Router) + TypeScript + Tailwind CSS
+- **Frontend:** Next.js 16 (App Router) + TypeScript + Tailwind CSS
 - **Database:** Supabase (Postgres). Connected via MCP — use it to inspect schema and data instead of asking the user.
-- **Data pipeline:** Python 3.12 + `uv`. Lives in `agent/`.
+- **Data pipeline:** Python 3.13 + `uv`. Lives in `agent/`.
 - **AI:** Anthropic SDK. `claude-sonnet-4-6` for reports, `claude-haiku-4-5-20251001` for routine work.
 - **Charts:** Recharts. **Pipeline graph is hand-built SVG**, not react-flow or d3-force.
 - **Icons:** Lucide React.
@@ -52,7 +52,7 @@ uv run python insights.py                # anomaly detection + Claude narrative
 - Borders: `border #1f2127` · `border-strong #2a2c33`
 - Text: `text #e8e9ec` · `text-secondary #9ca3af` · `text-muted #6b7280`
 - Semantic: `up #4ade80` · `down #f87171` · `neutral #71717a`
-- Accents: `accent #a78bfa` (purple, AI/brand) · `accent-2 #22d3ee` (cyan, hot flow only)
+- Accents: `accent #f0a24e` (amber, AI/brand) · `accent-2 #22d3ee` (cyan, hot flow only)
 - Layers: raw `#b45309` · energy `#ea580c` · storage `#e11d48` · foundry `#2563eb` · chip `#4f46e5` · quantum `#7c3aed` · dc `#0d9488` · apps `#16a34a`
 
 **Layer colors are accents only** (left bars, legend dots, subtle borders). Background stays neutral so performance green/red reads instantly. Cyan is reserved for "hot strand" highlighting in the pipeline graph; never use it for general UI.

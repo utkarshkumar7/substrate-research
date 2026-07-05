@@ -4,7 +4,7 @@ import type { Topology } from './types';
 export const TOPOLOGY: Topology = {
   "metadata": {
     "name": "Substrate",
-    "description": "Pipeline from silicon to chatbot",
+    "description": "Pipeline from silicon to inference and agents",
     "version": 2,
     "lastUpdated": "2026-05-20"
   },
