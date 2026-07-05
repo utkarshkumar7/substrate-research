@@ -9,7 +9,7 @@ export default async function InsightList() {
   if (!insights.length) {
     return (
       <p className="text-text-muted" style={{ fontSize: 11 }}>
-        No insights yet — run <code className="font-mono">uv run python insights.py</code> (Phase 7)
+        No signals in the last 7 days. New anomalies and flow shifts appear here after each refresh.
       </p>
     )
   }

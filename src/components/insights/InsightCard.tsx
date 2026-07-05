@@ -1,5 +1,6 @@
 import Link from "next/link"
 import type { InsightRow } from "@/lib/queries/insights"
+import { stripMarkdown } from "@/lib/format"
 
 function hrefForKind(kind: string): string {
   if (kind === "daily" || kind === "weekly") return "/daily"
@@ -11,9 +12,9 @@ const KIND_META: Record<string, { label: string; color: string; bg: string }> = 
   anomaly: { label: "ANOMALY", color: "#f87171", bg: "rgba(248,113,113,0.12)" },
   flow:    { label: "FLOW",    color: "#22d3ee", bg: "rgba(34,211,238,0.10)" },
   signal:  { label: "SIGNAL",  color: "#4ade80", bg: "rgba(74,222,128,0.10)" },
-  context: { label: "CONTEXT", color: "#a78bfa", bg: "rgba(167,139,250,0.10)" },
-  daily:   { label: "DAILY",   color: "#a78bfa", bg: "rgba(167,139,250,0.10)" },
-  weekly:  { label: "WEEKLY",  color: "#a78bfa", bg: "rgba(167,139,250,0.10)" },
+  context: { label: "CONTEXT", color: "#f0a24e", bg: "rgba(240,162,78,0.12)" },
+  daily:   { label: "DAILY",   color: "#f0a24e", bg: "rgba(240,162,78,0.12)" },
+  weekly:  { label: "WEEKLY",  color: "#f0a24e", bg: "rgba(240,162,78,0.12)" },
 }
 
 function timeAgo(iso: string): string {
@@ -83,7 +84,7 @@ export default function InsightCard({ insight }: { insight: InsightRow }) {
           overflow: "hidden",
         } as React.CSSProperties}
       >
-        {insight.body}
+        {stripMarkdown(insight.body)}
       </div>
 
       {/* Footer */}
