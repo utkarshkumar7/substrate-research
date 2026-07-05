@@ -41,33 +41,29 @@ export async function getRecentCloses(
 /**
  * Fetches enough history to compute 1d/5d/1m/YTD % changes for each symbol.
  * Returns a SymbolSnapshot per symbol.
+ *
+ * Uses a server-side RPC to avoid the PostgREST 1000-row cap (28k+ rows for 80 symbols).
  */
 export async function getHeatmapSnapshot(
   client: SupabaseClient<Database>,
   symbols: string[]
 ): Promise<Record<string, SymbolSnapshot>> {
-  // Fetch since start of previous year to cover any YTD calculation
-  const yearStart = `${new Date().getFullYear() - 1}-01-01`;
-
-  const { data, error } = await client
-    .from("prices")
-    .select("symbol, trade_date, close")
-    .in("symbol", symbols)
-    .gte("trade_date", yearStart)
-    .order("trade_date", { ascending: false });
+  const { data, error } = await client.rpc("get_heatmap_snapshots", {
+    p_symbols: symbols,
+  });
 
   if (error) throw error;
 
-  const grouped: Record<string, Array<{ date: string; close: number }>> = {};
-  for (const row of data ?? []) {
-    (grouped[row.symbol] ??= []).push({ date: row.trade_date, close: row.close });
-  }
-
   const result: Record<string, SymbolSnapshot> = {};
-  for (const symbol of symbols) {
-    const closes = grouped[symbol] ?? [];
-    const snap = buildSnapshot(closes);
-    if (snap) result[symbol] = snap;
+  for (const row of data ?? []) {
+    result[row.symbol] = {
+      latest: row.latest_close,
+      latestDate: row.latest_date,
+      pct1d: row.pct_1d ?? null,
+      pct5d: row.pct_5d ?? null,
+      pct1m: row.pct_1m ?? null,
+      pctYtd: row.pct_ytd ?? null,
+    };
   }
   return result;
 }
